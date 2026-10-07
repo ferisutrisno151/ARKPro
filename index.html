@@ -38,7 +38,6 @@
                 </h1>
             </div>
             <div class="flex items-center space-x-2">
-                <!-- Tombol Refresh Data (Tanpa reset ke awal) -->
                 <button onclick="manualRefreshData()" id="btn-refresh" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium flex items-center gap-1.5 shadow-sm transition" title="Refresh Data Terkini">
                     <i class="fa-solid fa-arrows-rotate" id="refresh-icon"></i> Refresh
                 </button>
@@ -461,10 +460,9 @@
             }, err => {});
         }
 
-        // Fungsi Tombol Refresh Manual (Mengambil data terbaru cloud tanpa reset awal)
         async function manualRefreshData() {
             const icon = document.getElementById('refresh-icon');
-            icon.classList.add('animate-spin-fast');
+            if(icon) icon.classList.add('animate-spin-fast');
             
             if (isFirebaseActive && db) {
                 try {
@@ -475,10 +473,15 @@
                         db.collection("perbaikan").get()
                     ]);
 
-                    inventarisData = []; invSnap.forEach(doc => inventarisData.push({ id: doc.id, ...doc.data() }));
-                    peminjamanData = []; pinSnap.forEach(doc => peminjamanData.push({ id: doc.id, ...doc.data() }));
-                    pengembalianData = []; retSnap.forEach(doc => pengembalianData.push({ id: doc.id, ...doc.data() }));
-                    perbaikanData = []; repSnap.forEach(doc => perbaikanData.push({ id: doc.id, ...doc.data() }));
+                    let tempInv = []; invSnap.forEach(doc => tempInv.push({ id: doc.id, ...doc.data() }));
+                    let tempPin = []; pinSnap.forEach(doc => tempPin.push({ id: doc.id, ...doc.data() }));
+                    let tempRet = []; retSnap.forEach(doc => tempRet.push({ id: doc.id, ...doc.data() }));
+                    let tempRep = []; repSnap.forEach(doc => tempRep.push({ id: doc.id, ...doc.data() }));
+
+                    if(tempInv.length > 0) inventarisData = tempInv;
+                    if(tempPin.length > 0) peminjamanData = tempPin;
+                    if(tempRet.length > 0) pengembalianData = tempRet;
+                    if(tempRep.length > 0) perbaikanData = tempRep;
                     
                     renderAll();
                 } catch(e) {
@@ -489,7 +492,7 @@
             }
 
             setTimeout(() => {
-                icon.classList.remove('animate-spin-fast');
+                if(icon) icon.classList.remove('animate-spin-fast');
             }, 500);
         }
 
@@ -695,6 +698,9 @@
 
         async function saveInventaris(e) {
             e.preventDefault();
+            // Langsung tutup modal agar responsif
+            closeInventarisModal();
+
             let editId = document.getElementById('inv-edit-id').value;
             let tgl = document.getElementById('inv-tgl').value;
             let rows = document.querySelectorAll('.inv-row-item');
@@ -725,15 +731,14 @@
                     await saveToCloudOrLocal('inventaris', itemData);
                 }
             }
-            closeInventarisModal();
-            manualRefreshData();
+            await manualRefreshData();
         }
 
         function editInventaris(id) { openInventarisModal(id); }
         async function deleteInventaris(id) {
             if(confirm('Hapus data inventaris alat ini?')) {
                 await deleteFromCloudOrLocal('inventaris', id);
-                manualRefreshData();
+                await manualRefreshData();
             }
         }
 
@@ -856,6 +861,9 @@
 
         async function savePeminjaman(e) {
             e.preventDefault();
+            // Langsung tutup modal agar responsif
+            closePeminjamanModal();
+
             let tgl = document.getElementById('pinjam-tgl').value;
             let peminjam = document.getElementById('pinjam-nama').value;
             let rows = document.querySelectorAll('.pinjam-row-item');
@@ -870,14 +878,13 @@
                 };
                 await saveToCloudOrLocal('peminjaman', pinjamData);
             }
-            closePeminjamanModal();
-            manualRefreshData();
+            await manualRefreshData();
         }
 
         async function deletePeminjaman(id) {
             if(confirm('Hapus data peminjaman ini?')) {
                 await deleteFromCloudOrLocal('peminjaman', id);
-                manualRefreshData();
+                await manualRefreshData();
             }
         }
 
@@ -892,6 +899,8 @@
 
         async function submitPengembalian(e) {
             e.preventDefault();
+            closePengembalianModal();
+
             let retData = {
                 peminjamanId: document.getElementById('ret-pinjam-id').value,
                 tgl: document.getElementById('ret-tgl').value,
@@ -899,14 +908,13 @@
                 kondisi: document.getElementById('ret-kondisi').value
             };
             await saveToCloudOrLocal('pengembalian', retData);
-            closePengembalianModal();
-            manualRefreshData();
+            await manualRefreshData();
         }
 
         async function deletePengembalian(id) {
             if(confirm('Batalkan catatan pengembalian ini?')) {
                 await deleteFromCloudOrLocal('pengembalian', id);
-                manualRefreshData();
+                await manualRefreshData();
             }
         }
 
@@ -979,6 +987,8 @@
 
         async function submitPerbaikan(e) {
             e.preventDefault();
+            closePerbaikanModal();
+
             let pengembalianId = document.getElementById('rep-index').value;
             let r = pengembalianData.find(x => x.id === pengembalianId);
             let repData = {
@@ -988,8 +998,7 @@
                 qty: r ? r.qty : 1
             };
             await saveToCloudOrLocal('perbaikan', repData);
-            closePerbaikanModal();
-            manualRefreshData();
+            await manualRefreshData();
         }
 
         function openDetailModal(type) {
