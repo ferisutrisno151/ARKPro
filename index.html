@@ -438,26 +438,45 @@
             db.collection("inventaris").onSnapshot(snapshot => {
                 inventarisData = [];
                 snapshot.forEach(doc => inventarisData.push({ id: doc.id, ...doc.data() }));
+                saveLocalBackup();
                 renderAll();
             }, err => { loadLocalData(); });
 
             db.collection("peminjaman").onSnapshot(snapshot => {
                 peminjamanData = [];
                 snapshot.forEach(doc => peminjamanData.push({ id: doc.id, ...doc.data() }));
+                saveLocalBackup();
                 renderAll();
             }, err => {});
 
             db.collection("pengembalian").onSnapshot(snapshot => {
                 pengembalianData = [];
                 snapshot.forEach(doc => pengembalianData.push({ id: doc.id, ...doc.data() }));
+                saveLocalBackup();
                 renderAll();
             }, err => {});
 
             db.collection("perbaikan").onSnapshot(snapshot => {
                 perbaikanData = [];
                 snapshot.forEach(doc => perbaikanData.push({ id: doc.id, ...doc.data() }));
+                saveLocalBackup();
                 renderAll();
             }, err => {});
+        }
+
+        function saveLocalBackup() {
+            localStorage.setItem('lokal_inventaris', JSON.stringify(inventarisData));
+            localStorage.setItem('lokal_peminjaman', JSON.stringify(peminjamanData));
+            localStorage.setItem('lokal_pengembalian', JSON.stringify(pengembalianData));
+            localStorage.setItem('lokal_perbaikan', JSON.stringify(perbaikanData));
+        }
+
+        function loadLocalData() {
+            inventarisData = JSON.parse(localStorage.getItem('lokal_inventaris')) || [];
+            peminjamanData = JSON.parse(localStorage.getItem('lokal_peminjaman')) || [];
+            pengembalianData = JSON.parse(localStorage.getItem('lokal_pengembalian')) || [];
+            perbaikanData = JSON.parse(localStorage.getItem('lokal_perbaikan')) || [];
+            renderAll();
         }
 
         async function manualRefreshData() {
@@ -476,16 +495,18 @@
                     let tempInv = []; invSnap.forEach(doc => tempInv.push({ id: doc.id, ...doc.data() }));
                     let tempPin = []; pinSnap.forEach(doc => tempPin.push({ id: doc.id, ...doc.data() }));
                     let tempRet = []; retSnap.forEach(doc => tempRet.push({ id: doc.id, ...doc.data() }));
-                    let tempRep = []; repSnap.forEach(doc => tempRep.push({ id: doc.id, ...doc.data() }));
+                    let tempRep = []; repSnap.forEach(doc => repSnap.push({ id: doc.id, ...doc.data() }));
 
                     if(tempInv.length > 0) inventarisData = tempInv;
                     if(tempPin.length > 0) peminjamanData = tempPin;
                     if(tempRet.length > 0) pengembalianData = tempRet;
                     if(tempRep.length > 0) perbaikanData = tempRep;
-                    
+
+                    saveLocalBackup();
                     renderAll();
                 } catch(e) {
-                    console.error("Gagal refresh:", e);
+                    console.error("Gagal refresh cloud:", e);
+                    loadLocalData();
                 }
             } else {
                 loadLocalData();
@@ -496,22 +517,6 @@
             }, 500);
         }
 
-        function loadLocalData() {
-            inventarisData = JSON.parse(localStorage.getItem('lokal_inventaris')) || [];
-            peminjamanData = JSON.parse(localStorage.getItem('lokal_peminjaman')) || [];
-            pengembalianData = JSON.parse(localStorage.getItem('lokal_pengembalian')) || [];
-            perbaikanData = JSON.parse(localStorage.getItem('lokal_perbaikan')) || [];
-            renderAll();
-        }
-
-        function saveDataLocal() {
-            localStorage.setItem('lokal_inventaris', JSON.stringify(inventarisData));
-            localStorage.setItem('lokal_peminjaman', JSON.stringify(peminjamanData));
-            localStorage.setItem('lokal_pengembalian', JSON.stringify(pengembalianData));
-            localStorage.setItem('lokal_perbaikan', JSON.stringify(perbaikanData));
-            renderAll();
-        }
-
         async function saveToCloudOrLocal(collectionName, data, docId = null) {
             if (isFirebaseActive && db) {
                 try {
@@ -520,11 +525,11 @@
                     } else {
                         await db.collection(collectionName).add(data);
                     }
-                    return;
                 } catch (e) {
                     console.error("Cloud save error:", e);
                 }
             }
+            // Simpan juga ke memori lokal browser agar aman
             if(collectionName === 'inventaris') {
                 if(docId) { let idx = inventarisData.findIndex(x=>x.id===docId); if(idx>=0) inventarisData[idx]={id:docId,...data}; }
                 else { inventarisData.push({id: 'INV_' + Date.now() + Math.random(), ...data}); }
@@ -538,21 +543,22 @@
                 if(docId) { let idx = perbaikanData.findIndex(x=>x.id===docId); if(idx>=0) perbaikanData[idx]={id:docId,...data}; }
                 else { perbaikanData.push({id: 'REP_' + Date.now() + Math.random(), ...data}); }
             }
-            saveDataLocal();
+            saveLocalBackup();
+            renderAll();
         }
 
         async function deleteFromCloudOrLocal(collectionName, docId) {
             if (isFirebaseActive && db) {
                 try {
                     await db.collection(collectionName).doc(docId).delete();
-                    return;
                 } catch(e) { console.error(e); }
             }
             if(collectionName === 'inventaris') inventarisData = inventarisData.filter(x => x.id !== docId);
             if(collectionName === 'peminjaman') peminjamanData = peminjamanData.filter(x => x.id !== docId);
             if(collectionName === 'pengembalian') pengembalianData = pengembalianData.filter(x => x.id !== docId);
             if(collectionName === 'perbaikan') perbaikanData = perbaikanData.filter(x => x.id !== docId);
-            saveDataLocal();
+            saveLocalBackup();
+            renderAll();
         }
 
         function toggleSidebar() {
@@ -698,7 +704,6 @@
 
         async function saveInventaris(e) {
             e.preventDefault();
-            // Langsung tutup modal agar responsif
             closeInventarisModal();
 
             let editId = document.getElementById('inv-edit-id').value;
@@ -718,6 +723,7 @@
                 };
                 await saveToCloudOrLocal('inventaris', itemData, editId);
             } else {
+                // Perbaikan Looping Multi-Baris: Memastikan SEMUA baris tersimpan
                 for(let row of rows) {
                     let itemData = {
                         tgl,
@@ -731,14 +737,12 @@
                     await saveToCloudOrLocal('inventaris', itemData);
                 }
             }
-            await manualRefreshData();
         }
 
         function editInventaris(id) { openInventarisModal(id); }
         async function deleteInventaris(id) {
             if(confirm('Hapus data inventaris alat ini?')) {
                 await deleteFromCloudOrLocal('inventaris', id);
-                await manualRefreshData();
             }
         }
 
@@ -861,7 +865,6 @@
 
         async function savePeminjaman(e) {
             e.preventDefault();
-            // Langsung tutup modal agar responsif
             closePeminjamanModal();
 
             let tgl = document.getElementById('pinjam-tgl').value;
@@ -878,13 +881,11 @@
                 };
                 await saveToCloudOrLocal('peminjaman', pinjamData);
             }
-            await manualRefreshData();
         }
 
         async function deletePeminjaman(id) {
             if(confirm('Hapus data peminjaman ini?')) {
                 await deleteFromCloudOrLocal('peminjaman', id);
-                await manualRefreshData();
             }
         }
 
@@ -908,13 +909,11 @@
                 kondisi: document.getElementById('ret-kondisi').value
             };
             await saveToCloudOrLocal('pengembalian', retData);
-            await manualRefreshData();
         }
 
         async function deletePengembalian(id) {
             if(confirm('Batalkan catatan pengembalian ini?')) {
                 await deleteFromCloudOrLocal('pengembalian', id);
-                await manualRefreshData();
             }
         }
 
@@ -998,7 +997,6 @@
                 qty: r ? r.qty : 1
             };
             await saveToCloudOrLocal('perbaikan', repData);
-            await manualRefreshData();
         }
 
         function openDetailModal(type) {
@@ -1069,7 +1067,8 @@
         }
 
         window.onload = function() {
-            initFirebase();
+            loadLocalData(); // Muat data lokal seketika agar langsung tampil saat dibuka/refresh
+            initFirebase();  // Sinkronisasi dengan Cloud Firebase
         };
     </script>
 </body>
