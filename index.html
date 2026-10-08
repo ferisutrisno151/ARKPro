@@ -57,7 +57,7 @@
         </div>
 
         <div class="flex items-center space-x-3">
-            <!-- Tombol Refresh Manual (Tanpa mereset setelan awal) -->
+            <!-- Tombol Refresh Manual -->
             <button onclick="manualRefreshData()" id="btnRefresh" class="bg-slate-800 hover:bg-slate-700 text-slate-200 px-3 py-1.5 rounded-lg text-sm flex items-center space-x-1.5 border border-slate-700 transition shadow-sm">
                 <i class="fa-solid fa-rotate-right" id="refreshIcon"></i>
                 <span class="hidden sm:inline">Refresh</span>
@@ -151,11 +151,11 @@
                 </div>
             </div>
 
-            <!-- KPI Cards -->
+            <!-- KPI Cards dengan perbaikan z-index dan pointer-events -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <!-- Card 1: Total Alat -->
-                <div onclick="openDashboardDetail('total')" class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:border-indigo-500 cursor-pointer transition transform hover:-translate-y-1">
-                    <div class="flex items-center justify-between">
+                <div onclick="openDashboardDetail('total')" class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:border-indigo-500 cursor-pointer transition transform hover:-translate-y-1 relative z-10">
+                    <div class="flex items-center justify-between pointer-events-none">
                         <div>
                             <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Total Alat</p>
                             <h3 id="kpiTotalAlat" class="text-3xl font-bold text-slate-900 mt-1">0</h3>
@@ -164,15 +164,15 @@
                             <i class="fa-solid fa-boxes-stacked"></i>
                         </div>
                     </div>
-                    <div class="mt-4 flex items-center text-xs text-indigo-600 font-medium">
+                    <div class="mt-4 flex items-center text-xs text-indigo-600 font-medium pointer-events-none">
                         <span>Klik untuk rincian tabel</span>
                         <i class="fa-solid fa-arrow-right ml-1"></i>
                     </div>
                 </div>
 
                 <!-- Card 2: Kondisi Baik -->
-                <div onclick="openDashboardDetail('baik')" class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:border-emerald-500 cursor-pointer transition transform hover:-translate-y-1">
-                    <div class="flex items-center justify-between">
+                <div onclick="openDashboardDetail('baik')" class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:border-emerald-500 cursor-pointer transition transform hover:-translate-y-1 relative z-10">
+                    <div class="flex items-center justify-between pointer-events-none">
                         <div>
                             <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Kondisi Baik</p>
                             <h3 id="kpiKondisiBaik" class="text-3xl font-bold text-emerald-600 mt-1">0</h3>
@@ -181,15 +181,15 @@
                             <i class="fa-solid fa-circle-check"></i>
                         </div>
                     </div>
-                    <div class="mt-4 flex items-center text-xs text-emerald-600 font-medium">
+                    <div class="mt-4 flex items-center text-xs text-emerald-600 font-medium pointer-events-none">
                         <span>Klik untuk rincian tabel</span>
                         <i class="fa-solid fa-arrow-right ml-1"></i>
                     </div>
                 </div>
 
                 <!-- Card 3: Rusak / Perbaikan -->
-                <div onclick="openDashboardDetail('rusak')" class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:border-rose-500 cursor-pointer transition transform hover:-translate-y-1">
-                    <div class="flex items-center justify-between">
+                <div onclick="openDashboardDetail('rusak')" class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:border-rose-500 cursor-pointer transition transform hover:-translate-y-1 relative z-10">
+                    <div class="flex items-center justify-between pointer-events-none">
                         <div>
                             <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Rusak / Perbaikan</p>
                             <h3 id="kpiRusakPerbaikan" class="text-3xl font-bold text-rose-600 mt-1">0</h3>
@@ -198,15 +198,15 @@
                             <i class="fa-solid fa-triangle-exclamation"></i>
                         </div>
                     </div>
-                    <div class="mt-4 flex items-center text-xs text-rose-600 font-medium">
+                    <div class="mt-4 flex items-center text-xs text-rose-600 font-medium pointer-events-none">
                         <span>Klik untuk rincian tabel</span>
                         <i class="fa-solid fa-arrow-right ml-1"></i>
                     </div>
                 </div>
 
                 <!-- Card 4: Stok Alat Tersedia -->
-                <div onclick="openDashboardDetail('stok')" class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:border-sky-500 cursor-pointer transition transform hover:-translate-y-1">
-                    <div class="flex items-center justify-between">
+                <div onclick="openDashboardDetail('stok')" class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:border-sky-500 cursor-pointer transition transform hover:-translate-y-1 relative z-10">
+                    <div class="flex items-center justify-between pointer-events-none">
                         <div>
                             <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Stok Alat Tersedia</p>
                             <h3 id="kpiStokTersedia" class="text-3xl font-bold text-sky-600 mt-1">0</h3>
@@ -215,7 +215,7 @@
                             <i class="fa-solid fa-warehouse"></i>
                         </div>
                     </div>
-                    <div class="mt-4 flex items-center text-xs text-sky-600 font-medium">
+                    <div class="mt-4 flex items-center text-xs text-sky-600 font-medium pointer-events-none">
                         <span>Klik untuk rincian tabel</span>
                         <i class="fa-solid fa-arrow-right ml-1"></i>
                     </div>
@@ -265,7 +265,7 @@
                 <div class="text-sm text-slate-500 font-medium" id="countInventarisText">Total: 0 item</div>
             </div>
 
-            <!-- Tabel Memanjang (Horizontal Scroll & No Wrap) -->
+            <!-- Tabel Memanjang -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse no-wrap-table">
@@ -407,7 +407,7 @@
 
     <!-- ==================== MODALS ==================== -->
 
-    <!-- MODAL 1: FORM TAMBAH / EDIT INVENTARIS (MULTI-ITEM SATU TANGGAL) -->
+    <!-- MODAL 1: FORM TAMBAH / EDIT INVENTARIS -->
     <div id="modalInventaris" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl max-w-3xl w-full p-6 shadow-2xl max-h-[90vh] flex flex-col">
             <div class="flex items-center justify-between pb-4 border-b border-slate-200">
@@ -426,7 +426,6 @@
                     </div>
                 </div>
 
-                <!-- Container Multi-Item Input -->
                 <div class="space-y-3 pt-2">
                     <div class="flex items-center justify-between">
                         <label class="text-xs font-semibold text-slate-600 uppercase">Daftar Item Alat</label>
@@ -448,7 +447,7 @@
         </div>
     </div>
 
-    <!-- MODAL 2: FORM PEMINJAMAN (MULTI-ITEM SATU TANGGAL & PEMINJAM) -->
+    <!-- MODAL 2: FORM PEMINJAMAN -->
     <div id="modalPinjam" class="fixed inset-0 bg-black/60 z-50 hidden flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-2xl max-w-4xl w-full p-6 shadow-2xl max-h-[90vh] flex flex-col">
             <div class="flex items-center justify-between pb-4 border-b border-slate-200">
@@ -475,7 +474,6 @@
                     </div>
                 </div>
 
-                <!-- Container Multi-Item Pinjam -->
                 <div class="space-y-3 pt-2">
                     <div class="flex items-center justify-between">
                         <label class="text-xs font-semibold text-slate-600 uppercase">Pilih No Inventaris Alat</label>
@@ -613,8 +611,6 @@
 
     <!-- ==================== MAIN SCRIPT ==================== -->
     <script>
-        // --- KONFIGURASI FIREBASE ---
-        // (Ganti dengan konfigurasi Firebase project Anda untuk kolaborasi real-time)
         const firebaseConfig = {
             apiKey: "AIzaSyD-PlaceholderKeyForDemoProject12345",
             authDomain: "logistikpro-inventaris.firebaseapp.com",
@@ -624,7 +620,6 @@
             appId: "1:123456789012:web:abcdef1234567890"
         };
 
-        // Inisialisasi Firebase aman dengan fallback localStorage jika offline/belum diset
         let db;
         try {
             if (!firebase.apps.length) {
@@ -635,14 +630,12 @@
             console.warn("Firebase belum terkonfigurasi penuh, menggunakan mode LocalStorage sync.");
         }
 
-        // --- STATE APLIKASI ---
         let state = {
             inventaris: [],
             peminjaman: [],
-            pengembalian: {} // key: pinjamId, value: array of pengembalian logs
+            pengembalian: {}
         };
 
-        // --- INIT SAAT HALAMAN DIMUAT ---
         document.addEventListener('DOMContentLoaded', () => {
             initSidebar();
             loadDataFromCloudOrLocal();
@@ -657,7 +650,6 @@
             if(document.getElementById('perbaikanTgl')) document.getElementById('perbaikanTgl').value = today;
         }
 
-        // --- SIDEBAR LOGIC ---
         function initSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebarOverlay');
@@ -681,7 +673,6 @@
             overlay.addEventListener('click', closeSidebar);
         }
 
-        // --- TAB SWITCHING ---
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById(`tab-${tabId}`).classList.remove('hidden');
@@ -695,21 +686,17 @@
                 }
             });
 
-            // Tutup sidebar jika di mobile
             document.getElementById('sidebar').classList.add('-translate-x-full');
             document.getElementById('sidebarOverlay').classList.add('hidden', 'opacity-0');
 
-            // Render sesuai tab
             if(tabId === 'dashboard') renderDashboard();
             if(tabId === 'inventaris') renderTableInventaris();
             if(tabId === 'peminjaman') renderTablesPeminjaman();
             if(tabId === 'stok') renderTableStok();
         }
 
-        // --- DATA SYNC (FIREBASE / LOCALSTORAGE) ---
         function loadDataFromCloudOrLocal() {
             if (db) {
-                // Realtime listener Firestore
                 db.collection("logistikPRO_data").doc("master").onSnapshot((doc) => {
                     if (doc.exists) {
                         const data = doc.data();
@@ -718,7 +705,6 @@
                         state.pengembalian = data.pengembalian || {};
                         refreshAllViews();
                     } else {
-                        // Init doc jika kosong
                         saveDataToCloud();
                     }
                 }, (error) => {
@@ -769,25 +755,6 @@
             if(activeTab === 'stok') renderTableStok();
         }
 
-        // --- HELPER KALKULASI STOK & KONDISI ---
-        // Menghitung total pengembalian untuk pinjamId tertentu berdasarkan jenis kondisi
-        function getReturnedQty(pinjamId, conditionType) {
-            const logs = state.pengembalian[pinjamId] || [];
-            return logs.reduce((sum, log) => {
-                if(conditionType === 'all') return sum + Number(log.qty);
-                // Cek status perbaikan untuk item yang awalnya 'perbaikan'
-                let currentCond = log.kondisi;
-                if(log.statusPerbaikan === 'selesai') currentCond = 'baik';
-                if(log.statusPerbaikan === 'rusak_total') currentCond = 'rusak';
-                
-                if(conditionType === 'baik' && currentCond === 'baik') return sum + Number(log.qty);
-                if(conditionType === 'rusak' && (currentCond === 'rusak' || currentCond === 'rusak_total')) return sum + Number(log.qty);
-                if(conditionType === 'perbaikan' && currentCond === 'perbaikan' && !log.statusPerbaikan) return sum + Number(log.qty);
-                return sum;
-            }, 0);
-        }
-
-        // --- FITUR 2: ALAT INVENTARIS ---
         function openModalInventaris(id = null) {
             document.getElementById('modalInventaris').classList.remove('hidden');
             const container = document.getElementById('inventarisRowsContainer');
@@ -864,7 +831,6 @@
             }
 
             if (editId) {
-                // Edit single item
                 const row = rows[0];
                 const item = state.inventaris.find(i => i.id === editId);
                 if (item) {
@@ -877,7 +843,6 @@
                     item.sat = row.querySelector('[name="sat"]').value;
                 }
             } else {
-                // Tambah baru (bisa multiple items dalam 1 tanggal)
                 rows.forEach(row => {
                     const newItem = {
                         id: 'INV_' + Date.now() + '_' + Math.random().toString(36.substr(2, 4)),
@@ -953,8 +918,6 @@
             });
         }
 
-
-        // --- FITUR 3: PEMINJAMAN & PENGEMBALIAN ---
         function openModalPinjam(id = null) {
             if(state.inventaris.length === 0) {
                 alert('Harap masukkan data alat inventaris terlebih dahulu sebelum melakukan peminjaman.');
@@ -994,7 +957,6 @@
             const container = document.getElementById('pinjamRowsContainer');
             const rowId = 'pinjam_row_' + Math.random().toString(36.substr(2, 9));
             
-            // Buat dropdown options dari master inventaris
             let optionsHtml = `<option value="">-- Pilih No Inventaris --</option>`;
             state.inventaris.forEach(inv => {
                 const selected = data.noInventaris === inv.noInventaris ? 'selected' : '';
@@ -1080,7 +1042,7 @@
                     const noInv = row.querySelector('[name="noInventaris"]').value;
                     const invRef = state.inventaris.find(i => i.noInventaris === noInv);
                     const newPinjam = {
-                        id: 'PIN_ ' + Date.now() + '_' + Math.random().toString(36.substr(2, 4)),
+                        id: 'PIN_' + Date.now() + '_' + Math.random().toString(36.substr(2, 4)),
                         tglPinjam: tglPinjam,
                         namaPeminjam: namaPeminjam,
                         lokasiKerja: lokasiKerja,
@@ -1111,7 +1073,6 @@
         }
 
         function renderTablesPeminjaman() {
-            // Render Tabel 1: Peminjaman
             const bodyPinjam = document.getElementById('tablePeminjamanBody');
             bodyPinjam.innerHTML = '';
 
@@ -1130,7 +1091,7 @@
                         <td class="p-3.5 text-slate-600">${item.brand}</td>
                         <td class="p-3.5 font-bold">${item.qty}</td>
                         <td class="p-3.5 text-slate-500">${item.sat}</td>
-                        <td class="p-3.5"><span class="bg-amber-50 text-amber-700 px-2 py-1 rounded-md text-xs font-semibold">${item.lokasiKerja}</span></td>
+                        <td class="p-3.5"><span class="bg-amber-50 text-amber-700 px-2.5 py-1 rounded-md text-xs font-semibold">${item.lokasiKerja}</span></td>
                         <td class="p-3.5 text-center">
                             <div class="flex items-center justify-center space-x-2">
                                 <button onclick="openModalPinjam('${item.id}')" class="w-8 h-8 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-indigo-100 flex items-center justify-center transition" title="Edit">
@@ -1146,7 +1107,6 @@
                 });
             }
 
-            // Render Tabel 2: Pengembalian & Perbaikan
             const bodyKembali = document.getElementById('tablePengembalianBody');
             bodyKembali.innerHTML = '';
 
@@ -1158,7 +1118,6 @@
             state.peminjaman.forEach((item, index) => {
                 const logs = state.pengembalian[item.id] || [];
                 
-                // Format riwayat pengembalian bersusun
                 let riwayatHtml = `<div class="space-y-1.5 py-1">`;
                 let statusHtml = `<div class="space-y-1.5 py-1">`;
                 let actionHtml = `<div class="flex items-center space-x-1.5">`;
@@ -1179,7 +1138,6 @@
                             condText = 'Rusak Total';
                         }
 
-                        // Jika status perbaikan terupdate
                         let statusPerbaikanBadge = '';
                         if(log.statusPerbaikan === 'selesai') {
                             statusPerbaikanBadge = `<span class="bg-indigo-50 text-indigo-700 px-1.5 py-0.5 rounded text-[10px] font-bold block mt-0.5"><i class="fa-solid fa-check"></i> Selesai Diperbaiki</span>`;
@@ -1191,8 +1149,8 @@
                             <div class="flex items-center justify-between bg-slate-50 px-2 py-1 rounded text-xs border border-slate-200">
                                 <span><strong>${log.tgl}:</strong> Qty ${log.qty} (<span class="font-medium">${condText}</span>)</span>
                                 <div class="flex items-center space-x-1 ml-2">
-                                    <button onclick="openModalPengembalian('${item.id}', ${logIdx})" class="text-indigo-600 hover:text-indigo-800 p-0.5" title="Edit Pengembalian"><i class="fa-solid fa-pen text-[10px]"></i></button>
-                                    <button onclick="deletePengembalianLog('${item.id}', ${logIdx})" class="text-rose-600 hover:text-rose-800 p-0.5" title="Hapus Pengembalian"><i class="fa-solid fa-trash text-[10px]"></i></button>
+                                    <button onclick="openModalPengembalian('${item.id}', ${logIdx})" class="text-indigo-600 hover:text-indigo-800 p-0.5" title="Edit"><i class="fa-solid fa-pen text-[10px]"></i></button>
+                                    <button onclick="deletePengembalianLog('${item.id}', ${logIdx})" class="text-rose-600 hover:text-rose-800 p-0.5" title="Hapus"><i class="fa-solid fa-trash text-[10px]"></i></button>
                                 </div>
                             </div>
                         `;
@@ -1203,21 +1161,16 @@
                 riwayatHtml += `</div>`;
                 statusHtml += `</div>`;
 
-                // Tombol aksi pengembalian & perbaikan
-                const totalReturned = logs.reduce((sum, l) => sum + Number(l.qty), 0);
-                const canReturnMore = totalReturned < item.qty;
-
                 actionHtml += `
-                    <button onclick="openModalPengembalian('${item.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-1 shadow-sm transition" title="Tambah Pengembalian">
+                    <button onclick="openModalPengembalian('${item.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-1 shadow-sm transition" title="Kembali">
                         <i class="fa-solid fa-rotate-left"></i> <span>Kembali</span>
                     </button>
                 `;
 
-                // Cek jika ada item dengan kondisi perbaikan yang belum diupdate
                 const hasPendingRepair = logs.some(l => l.kondisi === 'perbaikan' && !l.statusPerbaikan);
                 if(hasPendingRepair) {
                     actionHtml += `
-                        <button onclick="openModalPerbaikan('${item.id}')" class="bg-amber-600 hover:bg-amber-700 text-white px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-1 shadow-sm transition animate-pulse" title="Update Perbaikan">
+                        <button onclick="openModalPerbaikan('${item.id}')" class="bg-amber-600 hover:bg-amber-700 text-white px-2.5 py-1.5 rounded-lg text-xs font-medium flex items-center space-x-1 shadow-sm transition animate-pulse" title="Perbaikan">
                             <i class="fa-solid fa-screwdriver-wrench"></i> <span>Perbaikan</span>
                         </button>
                     `;
@@ -1244,7 +1197,6 @@
             });
         }
 
-        // --- PENGEMBALIAN MODAL & LOGIC ---
         function openModalPengembalian(pinjamId, logIndex = -1) {
             document.getElementById('modalPengembalian').classList.remove('hidden');
             document.getElementById('kembaliPinjamId').value = pinjamId;
@@ -1262,7 +1214,6 @@
                     document.getElementById('kembaliQty').value = log.qty;
                     document.getElementById('kembaliKondisi').value = log.kondisi;
                 } else {
-                    // Hitung sisa qty yang belum dikembalikan
                     const logs = state.pengembalian[pinjamId] || [];
                     const returned = logs.reduce((sum, l) => sum + Number(l.qty), 0);
                     const sisa = item.qty - returned;
@@ -1295,7 +1246,6 @@
 
                 const newLog = { tgl, qty, kondisi };
                 if(logIndex >= 0) {
-                    // Update existing log, pertahankan status perbaikan jika ada
                     newLog.statusPerbaikan = logs[logIndex].statusPerbaikan;
                     logs[logIndex] = newLog;
                 } else {
@@ -1319,10 +1269,8 @@
             }
         }
 
-        // --- PERBAIKAN MODAL & LOGIC ---
         function openModalPerbaikan(pinjamId) {
             const logs = state.pengembalian[pinjamId] || [];
-            // Cari log pertama yang kondisinya perbaikan dan belum diupdate
             const repairIdx = logs.findIndex(l => l.kondisi === 'perbaikan' && !l.statusPerbaikan);
             if(repairIdx === -1) {
                 alert('Tidak ada alat dalam status perbaikan aktif.');
@@ -1360,14 +1308,10 @@
             }
         }
 
-
-        // --- FITUR 4: STOK ALAT & REKAPITULASI ---
         function renderTableStok() {
             const tbody = document.getElementById('tableStokBody');
             tbody.innerHTML = '';
 
-            // Buat map rekapitulasi berdasarkan noInventaris
-            // Atau kelompokkan berdasarkan item inventaris unik
             if(state.inventaris.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="11" class="p-6 text-center text-slate-400">Belum ada data stok alat.</td></tr>`;
                 return;
@@ -1377,22 +1321,18 @@
                 const noInv = inv.noInventaris;
                 const totalAlat = Number(inv.qty);
 
-                // Hitung total dipinjam aktif (total pinjam - total kembali semua kondisi)
                 let dipinjam = 0;
                 let perbaikan = 0;
                 let rusak = 0;
                 let selesaiPerbaikan = 0;
-                let rusakTotalPerbaikan = 0;
 
                 state.peminjaman.filter(p => p.noInventaris === noInv).forEach(p => {
                     const pinjamQty = Number(p.qty);
                     const logs = state.pengembalian[p.id] || [];
                     const returnedQty = logs.reduce((sum, l) => sum + Number(l.qty), 0);
                     
-                    // Sisa yang masih dipinjam
                     dipinjam += Math.max(0, pinjamQty - returnedQty);
 
-                    // Hitung rincian dari logs pengembalian
                     logs.forEach(l => {
                         const q = Number(l.qty);
                         if(l.kondisi === 'rusak' || l.statusPerbaikan === 'rusak_total') {
@@ -1405,9 +1345,6 @@
                     });
                 });
 
-                // Rumus Alat Tersedia:
-                // Alat Tersedia = Total Alat - Dipinjam - Perbaikan - Rusak + Selesai Diperbaiki - Rusak Total Perbaikan
-                // (Catatan: Selesai diperbaiki kembali baik ke stok, Rusak total sudah masuk kolom rusak)
                 const alatTersedia = totalAlat - dipinjam - perbaikan - rusak + selesaiPerbaikan;
 
                 const tr = document.createElement('tr');
@@ -1429,8 +1366,6 @@
             });
         }
 
-
-        // --- DASHBOARD RENDER & KPI DETAIL ---
         function renderDashboard() {
             let totalAlat = 0;
             let kondisiBaik = 0;
@@ -1464,7 +1399,6 @@
                 const tersedia = tot - dipinjam - perbaikan - rusak + selesaiPerbaikan;
                 stokTersedia += Math.max(0, tersedia);
                 
-                // Kondisi baik = alat tersedia + selesai diperbaiki dari pengembalian kondisi baik
                 let returnedBaik = 0;
                 state.peminjaman.filter(p => p.noInventaris === noInv).forEach(p => {
                     const logs = state.pengembalian[p.id] || [];
@@ -1474,7 +1408,7 @@
                 });
                 
                 rusakPerbaikan += (rusak + perbaikan);
-                kondisiBaik += (Math.max(0, tersedia) + returnedBaik); // Estimasi akumulasi kondisi baik
+                kondisiBaik += (Math.max(0, tersedia) + returnedBaik);
             });
 
             document.getElementById('kpiTotalAlat').innerText = totalAlat;
@@ -1483,7 +1417,6 @@
             document.getElementById('kpiStokTersedia').innerText = stokTersedia;
         }
 
-        // Popup Rincian Dashboard ketika KPI diklik
         function openDashboardDetail(type) {
             const modal = document.getElementById('modalDashboardDetail');
             const title = document.getElementById('modalDashboardTitle');
@@ -1533,12 +1466,9 @@
             document.getElementById('modalDashboardDetail').classList.add('hidden');
         }
 
-
-        // --- EXPORT / IMPORT EXCEL (MULTI-SHEET) & JSON ---
         function exportToExcel() {
             const wb = XLSX.utils.book_new();
 
-            // Sheet 1: Inventaris
             const wsInventaris = XLSX.utils.json_to_sheet(state.inventaris.map((i, idx) => ({
                 No: idx + 1,
                 "Tgl Pembelian": i.tglPembelian,
@@ -1551,7 +1481,6 @@
             })));
             XLSX.utils.book_append_sheet(wb, wsInventaris, "Alat Inventaris");
 
-            // Sheet 2: Peminjaman
             const wsPinjam = XLSX.utils.json_to_sheet(state.peminjaman.map((p, idx) => ({
                 No: idx + 1,
                 "Tgl Pinjam": p.tglPinjam,
@@ -1565,7 +1494,6 @@
             })));
             XLSX.utils.book_append_sheet(wb, wsPinjam, "Peminjaman");
 
-            // Sheet 3: Pengembalian
             let kembalis = [];
             Object.keys(state.pengembalian).forEach(pid => {
                 const pinjam = state.peminjaman.find(p => p.id === pid);
@@ -1649,7 +1577,6 @@
             showToast("File aplikasi lengkap siap digunakan offline/online!", "success");
         }
 
-        // --- TOAST NOTIFICATION ---
         function showToast(message, type = 'success') {
             const toast = document.createElement('div');
             let bg = 'bg-slate-900 text-white';
