@@ -469,7 +469,7 @@
                                         <div class="space-y-1.5">
                                             <template x-for="(ret, rIdx) in (item.returns || [])" :key="rIdx">
                                                 <div class="flex items-center gap-2">
-                                                    <!-- Jika kondisi perbaikan sudah diselesaikan menjadi baik atau rusak total, badge kondisi otomatis berubah -->
+                                                    <!-- Badge kondisi otomatis berganti BAIK atau RUSAK jika perbaikan telah diselesaikan -->
                                                     <span class="px-2 py-0.5 rounded text-[11px] font-semibold"
                                                           :class="{
                                                               'bg-emerald-100 text-emerald-700': (ret.kondisi === 'baik') || (ret.kondisi === 'perbaikan' && ret.statusPerbaikan === 'selesai di perbaiki'),
@@ -479,7 +479,7 @@
                                                           x-text="(ret.kondisi === 'perbaikan' && ret.statusPerbaikan === 'selesai di perbaiki') ? 'BAIK' : ((ret.kondisi === 'perbaikan' && ret.statusPerbaikan === 'tidak bisa di perbaiki / rusak total') ? 'RUSAK' : ret.kondisi.toUpperCase())">
                                                     </span>
                                                     
-                                                    <!-- Jika masih dalam perbaikan, tampilkan status dan tombol perbaikan. Jika sudah selesai/tidak bisa diperbaiki, tombol perbaikan otomatis hilang -->
+                                                    <!-- Status perbaikan dan tombol perbaikan otomatis hilang jika sudah selesai / tidak bisa diperbaiki -->
                                                     <template x-if="ret.kondisi === 'perbaikan'">
                                                         <div class="flex items-center gap-1">
                                                             <span class="text-[10px] px-1.5 py-0.5 rounded font-medium"
@@ -488,10 +488,9 @@
                                                                       'bg-emerald-100 text-emerald-700': ret.statusPerbaikan === 'selesai di perbaiki',
                                                                       'bg-rose-100 text-rose-700': ret.statusPerbaikan === 'tidak bisa di perbaiki / rusak total'
                                                                   }"
-                                                                  x-text="ret.statusPerbaikan || 'Dalam Perbaikan'">
+                                                                  x-text="ret.statusPerbaikan === 'selesai di perbaiki' ? 'Selesai' : (ret.statusPerbaikan === 'tidak bisa di perbaiki / rusak total' ? 'Rusak Total' : (ret.statusPerbaikan || 'Dalam Perbaikan'))">
                                                             </span>
                                                             
-                                                            <!-- Tombol Perbaikan hanya muncul jika belum final -->
                                                             <template x-if="!ret.statusPerbaikan || ret.statusPerbaikan === 'Dalam Perbaikan'">
                                                                 <button @click="openRepairModal(item, rIdx)" class="bg-purple-600 hover:bg-purple-700 text-white p-1 rounded text-[10px]" title="Proses Perbaikan">
                                                                     <i class="fa-solid fa-screwdriver-wrench"></i> Perbaikan
@@ -996,17 +995,15 @@
                     }
                 },
 
-                // ================= CALCULATIONS & GETTERS (Sesuai Permintaan Baru) =================
+                // ================= CALCULATIONS & GETTERS =================
                 calcTotalQtyAlat() {
                     return this.inventoryList.reduce((acc, item) => acc + (Number(item.qty) || 0), 0);
                 },
 
-                // Panel Kondisi Baik = Inventaris - Peminjaman - Perbaikan Aktif - Rusak + Selesai Perbaikan - Rusak Total
                 calcConditionGoodQty() {
                     return this.calcAvailableStockQty();
                 },
 
-                // Panel Rusak / Perbaikan = Pengembalian kondisi rusak + perbaikan tidak bisa diperbaiki + perbaikan aktif
                 calcBrokenRepairQty() {
                     let count = 0;
                     this.borrowList.forEach(b => {
@@ -1051,8 +1048,6 @@
                         }
                     });
 
-                    // Rumus Alat Tersedia: inventaris alat - peminjaman - pengembalian kondisi rusak - pengembalian perbaikan tidak bisa diperbaiki + pengembalian perbaikan selesai diperbaiki
-                    // (Catatan: pengembalian kondisi baik / sudah dikembalikan juga otomatis memperkecil sisa peminjaman bersih)
                     let effectiveBorrow = Math.max(0, borrowed - returnedGood - returnedRepair - returnedBroken);
                     let res = total - effectiveBorrow - returnedBroken - repairUnfixable + repairCompletedGood;
                     return Math.max(0, res);
@@ -1085,27 +1080,18 @@
                                             perbaikan += q;
                                         } else if (r.statusPerbaikan === 'selesai di perbaiki') {
                                             selesaiBaik += q;
-                                            // Qty perbaikan berkurang sesuai tindakan (menjadi kosong/0)
                                         } else if (r.statusPerbaikan === 'tidak bisa di perbaiki / rusak total') {
                                             rusakTotal += q;
-                                            rusak += q; // Qty rusak bertambah
-                                            // Qty perbaikan berkurang menjadi kosong/0
+                                            rusak += q; 
                                         }
                                     }
                                 });
                             }
                         });
 
-                        // 1. Kolom Dipinjam: Qty pinjam dikurangi total yang sudah dikembalikan dengan kondisi apapun
                         let dipinjam = Math.max(0, rawBorrow - rawReturned);
-
-                        // 2. Kolom Perbaikan: Hanya menyisakan yang statusnya masih "Dalam Perbaikan" (yang sudah selesai/tidak bisa diperbaiki qty berkurang/kosong)
                         let netPerbaikan = Math.max(0, perbaikan);
-
-                        // 3. Kolom Rusak: Pengembalian rusak + perbaikan tidak bisa diperbaiki
                         let netRusak = rusak;
-
-                        // 4. Kolom Alat Tersedia: Inventaris - Peminjaman - Rusak - Perbaikan Tidak Bisa Diperbaiki + Perbaikan Selesai Baik
                         let tersedia = totalAlat - dipinjam - netRusak - netPerbaikan;
 
                         return {
@@ -1152,7 +1138,6 @@
                     return logs;
                 },
 
-                // ================= MODAL DETAIL DASHBOARD TABLES =================
                 getInventoryTableData() {
                     return this.inventoryList.map(i => ({ ...i, ket: 'Master Inventaris' }));
                 },
@@ -1192,7 +1177,6 @@
                     this.modalDetailOpen = true;
                 },
 
-                // ================= INVENTARIS CRUD =================
                 openAddInventoryModal() {
                     this.inventoryEditMode = false;
                     this.currentEditInvId = null;
@@ -1272,7 +1256,6 @@
                     }
                 },
 
-                // ================= PEMINJAMAN CRUD =================
                 openAddBorrowModal() {
                     this.borrowEditMode = false;
                     this.currentEditBorrowId = null;
@@ -1396,7 +1379,6 @@
                     }
                 },
 
-                // ================= PENGEMBALIAN & PERBAIKAN =================
                 openReturnModal(item) {
                     this.activeReturnItem = item;
                     this.activeReturnIndex = null;
@@ -1484,7 +1466,6 @@
                     this.updateChartsAndLogs();
                 },
 
-                // ================= EXPORT & IMPORT =================
                 exportToExcel() {
                     let wb = XLSX.utils.book_new();
 
@@ -1614,7 +1595,6 @@
                     alert("Aplikasi LogistikPRO ini berbasis Web App (PWA). Anda dapat menyimpannya ke Layar Utama perangkat (Add to Home Screen) melalui menu browser Anda atau menggunakannya langsung secara online.");
                 },
 
-                // ================= CHARTS =================
                 updateChartsAndLogs() {
                     if (this.currentTab === 'dashboard') {
                         setTimeout(() => this.renderCharts(), 100);
