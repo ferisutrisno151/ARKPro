@@ -26,17 +26,15 @@
         }
     </script>
     <style>
-        /* Mencegah wrap text pada tabel agar rapi dan bisa digeser horizontal */
         table th, table td {
             white-space: nowrap;
         }
-        /* Style untuk indikator pull to refresh */
         #pullRefreshIndicator {
             transition: transform 0.2s ease, opacity 0.2s ease;
         }
     </style>
 </head>
-<body class="bg-slate-100 font-sans text-slate-800 antialiased min-h-screen flex flex-col">
+<body class="bg-slate-100 font-sans text-slate-800 antialiased h-screen flex flex-col overflow-hidden">
 
     <!-- PULL TO REFRESH INDICATOR -->
     <div id="pullRefreshIndicator" class="fixed top-0 inset-x-0 z-50 flex justify-center items-center h-12 bg-accent text-white text-sm font-medium shadow-md transform -translate-y-full opacity-0">
@@ -44,7 +42,7 @@
     </div>
 
     <!-- TOP HEADER -->
-    <header class="bg-slate-900 text-white shadow-md sticky top-0 z-40 flex items-center justify-between px-4 py-3">
+    <header class="bg-slate-900 text-white shadow-md flex-none z-40 flex items-center justify-between px-4 py-3">
         <div class="flex items-center space-x-3">
             <button id="sidebarToggle" class="text-white hover:text-accent focus:outline-none text-xl p-1">
                 <i class="fa-solid fa-bars"></i>
@@ -66,8 +64,8 @@
         <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-40 hidden transition-opacity"></div>
 
         <!-- SIDEBAR -->
-        <aside id="sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-slate-300 transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col shadow-2xl">
-            <div class="p-4 border-b border-slate-800 flex items-center justify-between">
+        <aside id="sidebar" class="absolute inset-y-0 left-0 z-50 w-64 bg-slate-900 text-slate-300 transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col shadow-2xl">
+            <div class="p-4 border-b border-slate-800 flex items-center justify-between flex-none">
                 <span class="text-white font-bold text-lg"><i class="fa-solid fa-boxes-stacked mr-2 text-accent"></i>Menu Utama</span>
                 <button id="sidebarClose" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
@@ -95,15 +93,13 @@
         </aside>
 
         <!-- MAIN CONTENT AREA -->
-        <main id="mainContainer" class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 transition-all">
+        <main id="mainContainer" class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-6">
             
             <!-- FITUR 1: DASHBOARD -->
             <section id="tab-dashboard" class="tab-content space-y-6">
-                <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    <div>
-                        <h2 class="text-2xl font-bold text-slate-900">Dashboard Inventaris</h2>
-                        <p class="text-sm text-slate-500">Ringkasan kondisi dan pergerakan alat proyek secara real-time.</p>
-                    </div>
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">Dashboard Inventaris</h2>
+                    <p class="text-sm text-slate-500">Ringkasan kondisi dan pergerakan alat proyek secara real-time.</p>
                 </div>
 
                 <!-- Panel Cards -->
@@ -237,11 +233,9 @@
                         <h2 class="text-2xl font-bold text-slate-900">Peminjaman & Pengembalian</h2>
                         <p class="text-sm text-slate-500">Monitor sirkulasi peminjaman, pengembalian bertahap, dan perbaikan alat.</p>
                     </div>
-                    <div class="flex gap-2">
-                        <button onclick="openPinjamModal()" class="bg-accent hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition flex items-center justify-center space-x-2">
-                            <i class="fa-solid fa-hand-holding"></i><span>Form Peminjaman</span>
-                        </button>
-                    </div>
+                    <button onclick="openPinjamModal()" class="bg-accent hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-hand-holding"></i><span>Form Peminjaman</span>
+                    </button>
                 </div>
 
                 <!-- Tabel Peminjaman -->
@@ -302,11 +296,9 @@
 
             <!-- FITUR 4: STOK ALAT -->
             <section id="tab-stok" class="tab-content space-y-6 hidden">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <div>
-                        <h2 class="text-2xl font-bold text-slate-900">Stok Alat & Rekonsiliasi</h2>
-                        <p class="text-sm text-slate-500">Perhitungan otomatis total, peminjaman, perbaikan, rusak, dan ketersediaan gudang.</p>
-                    </div>
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-900">Stok Alat & Rekonsiliasi</h2>
+                    <p class="text-sm text-slate-500">Perhitungan otomatis total, peminjaman, perbaikan, rusak, dan ketersediaan gudang.</p>
                 </div>
 
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
@@ -335,7 +327,7 @@
         </main>
     </div>
 
-    <!-- MODAL-MODAL (Inventaris, Pinjam, Pengembalian, Perbaikan, Detail) -->
+    <!-- MODAL-MODAL -->
     <div id="modalInventaris" class="fixed inset-0 z-50 bg-black/50 hidden flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-xl shadow-xl max-w-4xl w-full p-6 space-y-4 my-8">
             <div class="flex justify-between items-center border-b pb-3">
@@ -512,7 +504,6 @@
             db = getDatabase(app);
             document.getElementById('syncStatus').innerText = "Terhubung Cloud (ArkPro)";
         } catch (e) {
-            console.warn("Koneksi Firebase gagal, menggunakan penyimpanan lokal.");
             document.getElementById('syncStatus').innerText = "Mode Offline (Local)";
             document.getElementById('syncStatus').className = "text-xs bg-amber-600 text-white px-2 py-1 rounded";
         }
@@ -527,7 +518,6 @@
         let chartKondisiInstance = null;
         let chartStokInstance = null;
 
-        // Load awal dengan listener real-time
         window.loadDataRealtime = function() {
             if (db) {
                 const dbRef = ref(db, 'inventaris_proyek/');
@@ -546,7 +536,6 @@
             }
         }
 
-        // FUNGSI SMART REFRESH (Ambil data terbaru tanpa mereset UI/Tab awal)
         window.smartRefresh = async function() {
             const icon = document.getElementById('refreshIcon');
             icon.classList.add('fa-spin');
@@ -560,7 +549,7 @@
                         ensureDataStructure();
                     }
                 } catch (err) {
-                    console.error("Gagal refresh dari cloud:", err);
+                    console.error("Gagal refresh:", err);
                 }
             } else {
                 loadFromLocal();
@@ -582,7 +571,7 @@
         window.saveDataCloud = function() {
             if (db) {
                 const dbRef = ref(db, 'inventaris_proyek/');
-                set(dbRef, window.appData).catch(err => console.error("Gagal simpan cloud:", err));
+                set(dbRef, window.appData).catch(err => console.error(err));
             }
             localStorage.setItem('arkpro_inventaris_local', JSON.stringify(window.appData));
             renderAll();
@@ -604,7 +593,6 @@
             setDefaultDates();
         });
 
-        // IMPLEMENTASI TARIK LAYAR (PULL TO REFRESH)
         function initPullToRefresh() {
             const container = document.getElementById('mainContainer');
             const indicator = document.getElementById('pullRefreshIndicator');
@@ -669,6 +657,7 @@
             });
             event.currentTarget.classList.add('bg-accent', 'text-white');
             closeSidebarMobile();
+            document.getElementById('mainContainer').scrollTop = 0;
         }
 
         function initSidebar() {
@@ -1295,7 +1284,8 @@
         window.importJSON = function(event) {
             const file = event.target.files[0];
             if(!file) return;
-            const reader.onload = function(e) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
                 try {
                     const json = JSON.parse(e.target.result);
                     window.appData = json;
