@@ -1123,7 +1123,7 @@
                             if (lastR.kondisi === 'baik') statusStr = 'Dikembalikan (Baik)';
                             else if (lastR.kondisi === 'rusak') statusStr = 'Dikembalikan (Rusak)';
                             else if (lastR.kondisi === 'perbaikan') {
-                                if (lastR.statusPerbaikan === 'selesai di perbaiki') statusStr = 'Dikembalikan (Baik)';
+                                else if (lastR.statusPerbaikan === 'selesai di perbaiki') statusStr = 'Dikembalikan (Baik)';
                                 else if (lastR.statusPerbaikan === 'tidak bisa di perbaiki / rusak total') statusStr = 'Dikembalikan (Rusak Total)';
                                 else statusStr = 'Perbaikan (Dalam Proses)';
                             }
