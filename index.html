@@ -136,7 +136,7 @@
         </div>
 
         <div class="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">
-            LogistikPRO Cloud v3.2 &bull; Realtime Sync
+            LogistikPRO Cloud v3.3 &bull; Realtime Sync
         </div>
     </aside>
 
@@ -473,11 +473,11 @@
                                                         <!-- Badge Kondisi Utama -->
                                                         <span class="px-2 py-0.5 rounded text-[11px] font-semibold"
                                                               :class="{
-                                                                  'bg-emerald-100 text-emerald-700': (ret.kondisi === 'baik') || (ret.statusPerbaikan === 'selesai di perbaiki'),
+                                                                  'bg-emerald-100 text-emerald-700': (ret.kondisi === 'baik') || (ret.statusPerbaikan === 'Selesai Diperbaiki (Kembali Baik)'),
                                                                   'bg-amber-100 text-amber-700': ret.kondisi === 'perbaikan' && (!ret.statusPerbaikan || ret.statusPerbaikan === 'Dalam Perbaikan'),
-                                                                  'bg-rose-100 text-rose-700': (ret.kondisi === 'rusak') || (ret.statusPerbaikan === 'tidak bisa di perbaiki / rusak total')
+                                                                  'bg-rose-100 text-rose-700': (ret.kondisi === 'rusak') || (ret.statusPerbaikan === 'Tidak Bisa Diperbaiki / Rusak Total')
                                                               }" 
-                                                              x-text="ret.statusPerbaikan === 'selesai di perbaiki' ? 'BAIK' : (ret.statusPerbaikan === 'tidak bisa di perbaiki / rusak total' ? 'RUSAK' : ret.kondisi.toUpperCase())">
+                                                              x-text="ret.statusPerbaikan === 'Selesai Diperbaiki (Kembali Baik)' ? 'BAIK' : (ret.statusPerbaikan === 'Tidak Bisa Diperbaiki / Rusak Total' ? 'RUSAK' : ret.kondisi.toUpperCase())">
                                                         </span>
                                                         
                                                         <template x-if="ret.kondisi === 'perbaikan'">
@@ -485,10 +485,10 @@
                                                                 <span class="text-[10px] px-1.5 py-0.5 rounded font-medium"
                                                                       :class="{
                                                                           'bg-purple-100 text-purple-700': !ret.statusPerbaikan || ret.statusPerbaikan === 'Dalam Perbaikan',
-                                                                          'bg-emerald-100 text-emerald-700': ret.statusPerbaikan === 'selesai di perbaiki',
-                                                                          'bg-rose-100 text-rose-700': ret.statusPerbaikan === 'tidak bisa di perbaiki / rusak total'
+                                                                          'bg-emerald-100 text-emerald-700': ret.statusPerbaikan === 'Selesai Diperbaiki (Kembali Baik)',
+                                                                          'bg-rose-100 text-rose-700': ret.statusPerbaikan === 'Tidak Bisa Diperbaiki / Rusak Total'
                                                                       }"
-                                                                      x-text="ret.statusPerbaikan === 'selesai di perbaiki' ? 'Selesai' : (ret.statusPerbaikan === 'tidak bisa di perbaiki / rusak total' ? 'Rusak Total' : 'Dalam Perbaikan')">
+                                                                      x-text="ret.statusPerbaikan === 'Selesai Diperbaiki (Kembali Baik)' ? 'Selesai Baik' : (ret.statusPerbaikan === 'Tidak Bisa Diperbaiki / Rusak Total' ? 'Rusak Total' : 'Dalam Perbaikan')">
                                                                 </span>
                                                                 
                                                                 <template x-if="!ret.statusPerbaikan || ret.statusPerbaikan === 'Dalam Perbaikan'">
@@ -847,8 +847,8 @@
                 <div>
                     <label class="block text-xs font-semibold text-slate-600 uppercase mb-1">Kondisi / Status Saat Ini</label>
                     <select x-model="repairFormStatus" class="w-full border border-slate-300 rounded-xl px-3 py-2 text-sm bg-white focus:ring-2 focus:ring-purple-500 focus:outline-none">
-                        <option value="selesai di perbaiki">Selesai Diperbaiki (Kembali Baik)</option>
-                        <option value="tidak bisa di perbaiki / rusak total">Tidak Bisa Diperbaiki / Rusak Total</option>
+                        <option value="Selesai Diperbaiki (Kembali Baik)">Selesai Diperbaiki (Kembali Baik)</option>
+                        <option value="Tidak Bisa Diperbaiki / Rusak Total">Tidak Bisa Diperbaiki / Rusak Total</option>
                     </select>
                 </div>
             </div>
@@ -929,7 +929,7 @@
                 activeRepairItem: null,
                 activeRepairIndex: null,
                 repairFormTgl: new Date().toISOString().split('T')[0],
-                repairFormStatus: 'selesai di perbaiki',
+                repairFormStatus: 'Selesai Diperbaiki (Kembali Baik)',
 
                 initApp() {
                     this.loadData();
@@ -1021,8 +1021,8 @@
                                 let q = Number(r.qtyKembali) || 0;
                                 if (r.kondisi === 'rusak') broken += q;
                                 if (r.kondisi === 'perbaikan') {
-                                    if (r.statusPerbaikan === 'tidak bisa di perbaiki / rusak total') repairUnfixable += q;
-                                    if (r.statusPerbaikan === 'selesai di perbaiki') repairCompletedGood += q;
+                                    if (r.statusPerbaikan === 'Tidak Bisa Diperbaiki / Rusak Total') repairUnfixable += q;
+                                    if (r.statusPerbaikan === 'Selesai Diperbaiki (Kembali Baik)') repairCompletedGood += q;
                                 }
                             });
                         }
@@ -1040,10 +1040,10 @@
                                 if (r.kondisi === 'perbaikan') {
                                     if (!r.statusPerbaikan || r.statusPerbaikan === 'Dalam Perbaikan') {
                                         count += (Number(r.qtyKembali) || 0);
-                                    } else if (r.statusPerbaikan === 'tidak bisa di perbaiki / rusak total') {
+                                    } else if (r.statusPerbaikan === 'Tidak Bisa Diperbaiki / Rusak Total') {
                                         count += (Number(r.qtyKembali) || 0);
                                     }
-                                }
+                                });
                             });
                         }
                     });
@@ -1083,9 +1083,9 @@
                                     } else if (r.kondisi === 'perbaikan') {
                                         if (!r.statusPerbaikan || r.statusPerbaikan === 'Dalam Perbaikan') {
                                             perbaikan += q;
-                                        } else if (r.statusPerbaikan === 'selesai di perbaiki') {
+                                        } else if (r.statusPerbaikan === 'Selesai Diperbaiki (Kembali Baik)') {
                                             selesaiBaik += q;
-                                        } else if (r.statusPerbaikan === 'tidak bisa di perbaiki / rusak total') {
+                                        } else if (r.statusPerbaikan === 'Tidak Bisa Diperbaiki / Rusak Total') {
                                             rusakTotal += q;
                                             rusak += q; 
                                         }
@@ -1123,8 +1123,8 @@
                             if (lastR.kondisi === 'baik') statusStr = 'Dikembalikan (Baik)';
                             else if (lastR.kondisi === 'rusak') statusStr = 'Dikembalikan (Rusak)';
                             else if (lastR.kondisi === 'perbaikan') {
-                                if (lastR.statusPerbaikan === 'selesai di perbaiki') statusStr = 'Dikembalikan (Baik - Selesai Perbaikan)';
-                                else if (lastR.statusPerbaikan === 'tidak bisa di perbaiki / rusak total') statusStr = 'Dikembalikan (Rusak Total)';
+                                if (lastR.statusPerbaikan === 'Selesai Diperbaiki (Kembali Baik)') statusStr = 'Dikembalikan (Baik - Selesai Perbaikan)';
+                                else if (lastR.statusPerbaikan === 'Tidak Bisa Diperbaiki / Rusak Total') statusStr = 'Dikembalikan (Rusak Total)';
                                 else statusStr = 'Perbaikan (Dalam Proses)';
                             }
                         }
@@ -1155,7 +1155,7 @@
                         if (b.returns) {
                             b.returns.forEach(r => {
                                 if (r.kondisi === 'rusak' || r.kondisi === 'perbaikan') {
-                                    if (!r.statusPerbaikan || r.statusPerbaikan === 'Dalam Perbaikan' || r.statusPerbaikan === 'tidak bisa di perbaiki / rusak total' || r.kondisi === 'rusak') {
+                                    if (!r.statusPerbaikan || r.statusPerbaikan === 'Dalam Perbaikan' || r.statusPerbaikan === 'Tidak Bisa Diperbaiki / Rusak Total' || r.kondisi === 'rusak') {
                                         rows.push({
                                             noInventaris: b.noInventaris,
                                             kategori: b.kategori || '-',
@@ -1450,7 +1450,7 @@
                     this.activeRepairIndex = rIdx;
                     let ret = item.returns[rIdx];
                     this.repairFormTgl = new Date().toISOString().split('T')[0];
-                    this.repairFormStatus = ret.statusPerbaikan || 'selesai di perbaiki';
+                    this.repairFormStatus = ret.statusPerbaikan || 'Selesai Diperbaiki (Kembali Baik)';
                     this.modalRepairOpen = true;
                 },
                 async saveRepair() {
@@ -1600,7 +1600,7 @@
                     alert("Aplikasi LogistikPRO ini berbasis Web App (PWA). Anda dapat menyimpannya ke Layar Utama perangkat (Add to Home Screen) melalui menu browser Anda atau menggunakannya langsung secara online.");
                 },
 
-                    updateChartsAndLogs() {
+                updateChartsAndLogs() {
                     if (this.currentTab === 'dashboard') {
                         setTimeout(() => this.renderCharts(), 100);
                     }
