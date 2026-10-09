@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inventaris Alat Proyek</title>
+    <title>Inventaris Alat Proyek - ArkPro</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -26,7 +26,7 @@
         }
     </script>
     <style>
-        /* Mencegah wrap text pada tabel agar rapi dan bisa digeser */
+        /* Mencegah wrap text pada tabel agar rapi dan bisa digeser horizontal */
         table th, table td {
             white-space: nowrap;
         }
@@ -40,7 +40,7 @@
             <button id="sidebarToggle" class="text-white hover:text-accent focus:outline-none text-xl p-1">
                 <i class="fa-solid fa-bars"></i>
             </button>
-            <h1 class="text-lg font-bold tracking-wide">Inventaris Alat Proyek</h1>
+            <h1 class="text-lg font-bold tracking-wide">Inventaris Alat Proyek (ArkPro)</h1>
         </div>
         <div class="flex items-center space-x-2">
             <button onclick="smartRefresh()" title="Refresh Data" class="bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded text-sm flex items-center space-x-1 transition">
@@ -181,9 +181,7 @@
                                     <th class="px-4 py-3">Keterangan</th>
                                 </tr>
                             </thead>
-                            <tbody id="tableDashboardBody" class="divide-y divide-slate-200">
-                                <!-- Data rendered via JS -->
-                            </tbody>
+                            <tbody id="tableDashboardBody" class="divide-y divide-slate-200"></tbody>
                         </table>
                     </div>
                 </div>
@@ -217,9 +215,7 @@
                                     <th class="px-4 py-3 text-center">Aksi</th>
                                 </tr>
                             </thead>
-                            <tbody id="tableInventarisBody" class="divide-y divide-slate-200">
-                                <!-- Rendered via JS -->
-                            </tbody>
+                            <tbody id="tableInventarisBody" class="divide-y divide-slate-200"></tbody>
                         </table>
                     </div>
                 </div>
@@ -330,7 +326,7 @@
         </main>
     </div>
 
-    <!-- MODAL FORM TAMBAH INVENTARIS (Multiple Rows) -->
+    <!-- MODAL FORM TAMBAH INVENTARIS -->
     <div id="modalInventaris" class="fixed inset-0 z-50 bg-black/50 hidden flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-xl shadow-xl max-w-4xl w-full p-6 space-y-4 my-8">
             <div class="flex justify-between items-center border-b pb-3">
@@ -355,9 +351,7 @@
                                 <th class="p-2 text-center">Aksi</th>
                             </tr>
                         </thead>
-                        <tbody id="invMultiBody">
-                            <!-- Rows inserted dynamically -->
-                        </tbody>
+                        <tbody id="invMultiBody"></tbody>
                     </table>
                 </div>
                 <button type="button" onclick="addInventarisRow()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded transition"><i class="fa-solid fa-plus mr-1"></i>Tambah Baris Alat</button>
@@ -369,7 +363,7 @@
         </div>
     </div>
 
-    <!-- MODAL FORM PEMINJAMAN (Multiple Rows) -->
+    <!-- MODAL FORM PEMINJAMAN -->
     <div id="modalPinjam" class="fixed inset-0 z-50 bg-black/50 hidden flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-xl shadow-xl max-w-4xl w-full p-6 space-y-4 my-8">
             <div class="flex justify-between items-center border-b pb-3">
@@ -473,7 +467,7 @@
         </div>
     </div>
 
-    <!-- MODAL RINCIAN DASHBOARD (PANEL KLIK) -->
+    <!-- MODAL RINCIAN DASHBOARD -->
     <div id="modalDetail" class="fixed inset-0 z-50 bg-black/50 hidden flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-xl shadow-xl max-w-5xl w-full p-6 space-y-4 my-8">
             <div class="flex justify-between items-center border-b pb-3">
@@ -492,37 +486,33 @@
         </div>
     </div>
 
-    <!-- FIREBASE SDKs -->
+    <!-- FIREBASE SDK & APP LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // ==========================================================
-        // KONFIGURASI FIREBASE ANDA
-        // ==========================================================
+        // Konfigurasi Firebase Proyek ArkPro
         const firebaseConfig = {
-            apiKey: "API_KEY_ANDA",
-            authDomain: "PROJECT_ID.firebaseapp.com",
-            databaseURL: "https://PROJECT_ID-default-rtdb.firebaseio.com",
-            projectId: "PROJECT_ID",
-            storageBucket: "PROJECT_ID.appspot.com",
-            messagingSenderId: "MESSAGING_SENDER_ID",
-            appId: "APP_ID"
+            apiKey: "AIzaSyASDID9jEZv0hTeFdN1rPx-eCFkH9Meghc",
+            authDomain: "arkpro-cb4af.firebaseapp.com",
+            databaseURL: "https://arkpro-cb4af-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "arkpro-cb4af",
+            storageBucket: "arkpro-cb4af.firebasestorage.app",
+            messagingSenderId: "1043039688353",
+            appId: "1:1043039688353:web:c74d010e7187cfd10842e0"
         };
 
-        // Inisialisasi Firebase
         let db;
         try {
             const app = initializeApp(firebaseConfig);
             db = getDatabase(app);
-            document.getElementById('syncStatus').innerText = "Terhubung Cloud";
+            document.getElementById('syncStatus').innerText = "Terhubung Cloud (ArkPro)";
         } catch (e) {
-            console.warn("Firebase belum dikonfigurasi / Error. Menggunakan localStorage offline.");
+            console.warn("Koneksi Firebase gagal, menggunakan penyimpanan lokal.");
             document.getElementById('syncStatus').innerText = "Mode Offline (Local)";
             document.getElementById('syncStatus').className = "text-xs bg-amber-600 text-white px-2 py-1 rounded";
         }
 
-        // Global App State
         window.appData = {
             inventaris: [],
             peminjaman: [],
@@ -533,7 +523,6 @@
         let chartKondisiInstance = null;
         let chartStokInstance = null;
 
-        // Sync Listener dari Firebase atau LocalStorage
         window.loadData = function() {
             if (db) {
                 const dbRef = ref(db, 'inventaris_proyek/');
@@ -560,26 +549,24 @@
                 const dbRef = ref(db, 'inventaris_proyek/');
                 set(dbRef, window.appData).catch(err => console.error("Gagal simpan cloud:", err));
             }
-            localStorage.setItem('inventaris_proyek_local', JSON.stringify(window.appData));
+            localStorage.setItem('arkpro_inventaris_local', JSON.stringify(window.appData));
             renderAll();
         }
 
         function loadFromLocal() {
-            const local = localStorage.getItem('inventaris_proyek_local');
+            const local = localStorage.getItem('arkpro_inventaris_local');
             if (local) {
                 window.appData = JSON.parse(local);
             }
             renderAll();
         }
 
-        // Panggil saat load awal
         window.addEventListener('DOMContentLoaded', () => {
             window.loadData();
             initSidebar();
             setDefaultDates();
         });
 
-        // Smart Refresh (Tanpa reset ke setelan awal)
         window.smartRefresh = function() {
             const icon = document.getElementById('refreshIcon');
             icon.classList.add('fa-spin');
@@ -597,7 +584,6 @@
             if(document.getElementById('perbaikanTgl')) document.getElementById('perbaikanTgl').value = today;
         }
 
-        // Render Seluruh Komponen & Tabel
         function renderAll() {
             renderDashboard();
             renderInventaris();
@@ -607,7 +593,6 @@
             renderCharts();
         }
 
-        // --- TAB SWITCHER ---
         window.switchTab = function(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.getElementById('tab-' + tabId).classList.remove('hidden');
@@ -620,7 +605,6 @@
             closeSidebarMobile();
         }
 
-        // Sidebar Overlay Toggle
         function initSidebar() {
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebarOverlay');
@@ -644,7 +628,7 @@
             overlay.addEventListener('click', closeSidebar);
         }
 
-        // --- FITUR 2: INVENTARIS LOGIC ---
+        // INVENTARIS LOGIC
         window.openInventarisModal = function() {
             document.getElementById('invMultiBody').innerHTML = '';
             addInventarisRow();
@@ -736,7 +720,7 @@
             window.saveDataCloud();
         }
 
-        // --- FITUR 3: PEMINJAMAN & PENGEMBALIAN LOGIC ---
+        // PEMINJAMAN LOGIC
         window.openPinjamModal = function() {
             document.getElementById('pinjamMultiBody').innerHTML = '';
             addPinjamRow();
@@ -840,7 +824,7 @@
             }
         }
 
-        // Pengembalian Bertahap Logic
+        // PENGEMBALIAN & PERBAIKAN LOGIC
         window.openPengembalianModalForItem = function(pinjamId) {
             document.getElementById('kembaliPinjamId').value = pinjamId;
             document.getElementById('kembaliQty').value = 1;
@@ -926,7 +910,6 @@
             }
         }
 
-        // Perbaikan Modal Logic
         window.openPerbaikanModal = function(id) {
             document.getElementById('perbaikanIndex').value = id;
             document.getElementById('modalPerbaikan').classList.remove('hidden');
@@ -947,10 +930,9 @@
             closePerbaikanModal();
         }
 
-        // --- FITUR 4: STOK ALAT & REKONSILIASI ---
+        // STOK ALAT & REKONSILIASI
         function calculateStokSummary() {
             let map = {};
-            // 1. Ambil Total Alat dari Inventaris
             window.appData.inventaris.forEach(inv => {
                 map[inv.noInventaris] = {
                     kategori: inv.kategori,
@@ -966,24 +948,17 @@
                 };
             });
 
-            // 2. Kurangi Dipinjam
             window.appData.peminjaman.forEach(p => {
                 if(map[p.noInventaris]) {
                     map[p.noInventaris].dipinjam += p.qty;
                 }
             });
 
-            // 3. Tambahkan Pengembalian & Perbaikan / Rusak
             window.appData.pengembalian.forEach(k => {
                 if(map[k.noInventaris]) {
-                    // Ketika dikembalikan, alat kembali ke gudang / perbaikan / rusak
-                    if(k.kondisiKembali === 'baik') {
-                        // Selesai dipinjam, kembali ke tersedia
-                    } else if(k.kondisiKembali === 'perbaikan') {
+                    if(k.kondisiKembali === 'perbaikan') {
                         if(k.statusPerbaikan === 'pending') {
                             map[k.noInventaris].perbaikan += k.qtyKembali;
-                        } else if(k.statusPerbaikan === 'selesai_perbaikan') {
-                            // Perbaikan selesai, kembali baik
                         } else if(k.statusPerbaikan === 'rusak_total') {
                             map[k.noInventaris].rusak += k.qtyKembali;
                         }
@@ -993,20 +968,15 @@
                 }
             });
 
-            // Hitung kalkulasi akhir Alat Tersedia sesuai rumus:
-            // inventaris - peminjaman - perbaikan - rusak + selesai_perbaikan - rusak_total (sudah terakumulasi)
             Object.keys(map).forEach(key => {
                 let item = map[key];
-                // Kurangi peminjaman aktif dari total alat
                 let currentPinjamQty = 0;
                 window.appData.peminjaman.filter(p => p.noInventaris === key).forEach(p => currentPinjamQty += p.qty);
                 
                 let currentPerbaikanQty = 0;
                 let currentRusakQty = 0;
                 window.appData.pengembalian.filter(k => k.noInventaris === key).forEach(k => {
-                    if(k.kondisiKembali === 'baik') {
-                        // Kembali ke gudang
-                    } else if(k.kondisiKembali === 'perbaikan') {
+                    if(k.kondisiKembali === 'perbaikan') {
                         if(k.statusPerbaikan === 'pending') currentPerbaikanQty += k.qtyKembali;
                         if(k.statusPerbaikan === 'rusak_total') currentRusakQty += k.qtyKembali;
                     } else if(k.kondisiKembali === 'rusak') {
@@ -1047,7 +1017,7 @@
             });
         }
 
-        // --- DASHBOARD & PANEL RINCIAN KLIK ---
+        // DASHBOARD & PANEL RINCIAN KLIK
         function renderDashboard() {
             const stokData = calculateStokSummary();
             let totalQtyAlat = 0;
@@ -1061,7 +1031,6 @@
                 totalRusakPerbaikan += (s.perbaikan + s.rusak);
             });
 
-            // Kondisi baik = total alat - rusak - perbaikan
             totalBaik = totalQtyAlat - totalRusakPerbaikan;
             if(totalBaik < 0) totalBaik = 0;
 
@@ -1070,7 +1039,6 @@
             document.getElementById('cardRusakPerbaikan').innerText = totalRusakPerbaikan;
             document.getElementById('cardStokAlat').innerText = totalStokTersedia;
 
-            // Render Dashboard Table
             const tbody = document.getElementById('tableDashboardBody');
             tbody.innerHTML = '';
             window.appData.peminjaman.forEach((p, idx) => {
@@ -1107,7 +1075,6 @@
             });
         }
 
-        // Panel Click Details Modal
         window.openDetailModal = function(type) {
             const modal = document.getElementById('modalDetail');
             const title = document.getElementById('modalDetailTitle');
@@ -1156,7 +1123,7 @@
             document.getElementById('modalDetail').classList.add('hidden');
         }
 
-        // --- CHARTS RENDER ---
+        // CHARTS
         function renderCharts() {
             const stokData = calculateStokSummary();
             let totalBaik = 0, totalPerbaikan = 0, totalRusak = 0;
@@ -1175,7 +1142,6 @@
                 totalDikembalikan += k.qtyKembali;
             });
 
-            // Chart Kondisi
             const ctx1 = document.getElementById('chartKondisi').getContext('2d');
             if(chartKondisiInstance) chartKondisiInstance.destroy();
             chartKondisiInstance = new Chart(ctx1, {
@@ -1192,7 +1158,6 @@
                 options: { responsive: true, maintainAspectRatio: false }
             });
 
-            // Chart Stok Donut
             const ctx2 = document.getElementById('chartStok').getContext('2d');
             if(chartStokInstance) chartStokInstance.destroy();
             chartStokInstance = new Chart(ctx2, {
@@ -1208,7 +1173,7 @@
             });
         }
 
-        // --- EXPORT / IMPORT EXCEL & JSON ---
+        // EXPORT / IMPORT EXCEL & JSON
         window.exportToExcel = function() {
             const wb = XLSX.utils.book_new();
             
@@ -1224,7 +1189,7 @@
             const wsStok = XLSX.utils.json_to_sheet(calculateStokSummary());
             XLSX.utils.book_append_sheet(wb, wsStok, "Stok Alat");
 
-            XLSX.writeFile(wb, "Data_Inventaris_Proyek.xlsx");
+            XLSX.writeFile(wb, "Data_Inventaris_ArkPro.xlsx");
         }
 
         window.importFromExcel = function(event) {
@@ -1255,7 +1220,7 @@
             const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(window.appData, null, 2));
             const downloadAnchor = document.createElement('a');
             downloadAnchor.setAttribute("href", dataStr);
-            downloadAnchor.setAttribute("download", "backup_inventaris_proyek.json");
+            downloadAnchor.setAttribute("download", "backup_arkpro.json");
             document.body.appendChild(downloadAnchor);
             downloadAnchor.click();
             downloadAnchor.remove();
@@ -1278,12 +1243,11 @@
             reader.readAsText(file);
         }
 
-        // --- SHARE LINK, DOWNLOAD LINK / APK ---
         window.shareLink = function() {
             if(navigator.share) {
                 navigator.share({
-                    title: 'Inventaris Alat Proyek',
-                    text: 'Akses sistem inventaris dan peminjaman alat proyek bersama:',
+                    title: 'Inventaris Alat Proyek (ArkPro)',
+                    text: 'Akses sistem inventaris alat bersama:',
                     url: window.location.href
                 }).catch(() => {});
             } else {
@@ -1293,7 +1257,7 @@
         }
 
         window.downloadApp = function() {
-            alert("Untuk mendownload aplikasi atau shortcut APK:\n1. Buka halaman ini melalui browser Chrome di HP Android.\n2. Klik menu titik tiga di kanan atas browser.\n3. Pilih 'Tambahkan ke Layar Utama' (Add to Home Screen) atau 'Instal Aplikasi' agar dapat diakses seperti aplikasi mobile (APK).");
+            alert("Untuk mendownload aplikasi atau shortcut APK:\n1. Buka halaman ini melalui browser Chrome di HP Android.\n2. Klik menu titik tiga di kanan atas.\n3. Pilih 'Tambahkan ke Layar Utama' (Add to Home Screen) agar dapat diakses layaknya aplikasi mobile.");
         }
     </script>
 </body>
