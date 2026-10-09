@@ -136,7 +136,7 @@
         </div>
 
         <div class="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">
-            LogistikPRO Cloud v2.9 &bull; Realtime Sync
+            LogistikPRO Cloud v3.0 &bull; Realtime Sync
         </div>
     </aside>
 
@@ -469,8 +469,8 @@
                                         <div class="space-y-2">
                                             <template x-for="(ret, rIdx) in (item.returns || [])" :key="rIdx">
                                                 <div class="bg-slate-50 p-2 rounded border border-slate-200 space-y-1 text-xs">
-                                                    <!-- Badge Kondisi Utama -->
                                                     <div class="flex items-center gap-2">
+                                                        <!-- Badge Kondisi Utama -->
                                                         <span class="px-2 py-0.5 rounded text-[11px] font-semibold"
                                                               :class="{
                                                                   'bg-emerald-100 text-emerald-700': (ret.kondisi === 'baik') || (ret.statusPerbaikan === 'selesai di perbaiki'),
