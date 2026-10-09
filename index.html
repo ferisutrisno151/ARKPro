@@ -136,7 +136,7 @@
         </div>
 
         <div class="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">
-            LogistikPRO Cloud v2.6 &bull; Realtime Sync
+            LogistikPRO Cloud v2.7 &bull; Realtime Sync
         </div>
     </aside>
 
@@ -469,7 +469,7 @@
                                         <div class="space-y-1.5">
                                             <template x-for="(ret, rIdx) in (item.returns || [])" :key="rIdx">
                                                 <div class="flex items-center gap-2">
-                                                    <!-- Badge kondisi otomatis berganti BAIK atau RUSAK jika perbaikan telah diselesaikan -->
+                                                    <!-- Badge kondisi otomatis berubah menjadi BAIK atau RUSAK jika perbaikan telah diselesaikan -->
                                                     <span class="px-2 py-0.5 rounded text-[11px] font-semibold"
                                                           :class="{
                                                               'bg-emerald-100 text-emerald-700': (ret.kondisi === 'baik') || (ret.kondisi === 'perbaikan' && ret.statusPerbaikan === 'selesai di perbaiki'),
@@ -479,7 +479,6 @@
                                                           x-text="(ret.kondisi === 'perbaikan' && ret.statusPerbaikan === 'selesai di perbaiki') ? 'BAIK' : ((ret.kondisi === 'perbaikan' && ret.statusPerbaikan === 'tidak bisa di perbaiki / rusak total') ? 'RUSAK' : ret.kondisi.toUpperCase())">
                                                     </span>
                                                     
-                                                    <!-- Status perbaikan dan tombol perbaikan otomatis hilang jika sudah selesai / tidak bisa diperbaiki -->
                                                     <template x-if="ret.kondisi === 'perbaikan'">
                                                         <div class="flex items-center gap-1">
                                                             <span class="text-[10px] px-1.5 py-0.5 rounded font-medium"
@@ -491,6 +490,7 @@
                                                                   x-text="ret.statusPerbaikan === 'selesai di perbaiki' ? 'Selesai' : (ret.statusPerbaikan === 'tidak bisa di perbaiki / rusak total' ? 'Rusak Total' : (ret.statusPerbaikan || 'Dalam Perbaikan'))">
                                                             </span>
                                                             
+                                                            <!-- Tombol perbaikan otomatis hilang jika sudah selesai diperbaiki atau rusak total -->
                                                             <template x-if="!ret.statusPerbaikan || ret.statusPerbaikan === 'Dalam Perbaikan'">
                                                                 <button @click="openRepairModal(item, rIdx)" class="bg-purple-600 hover:bg-purple-700 text-white p-1 rounded text-[10px]" title="Proses Perbaikan">
                                                                     <i class="fa-solid fa-screwdriver-wrench"></i> Perbaikan
@@ -1000,8 +1000,27 @@
                     return this.inventoryList.reduce((acc, item) => acc + (Number(item.qty) || 0), 0);
                 },
 
+                // Panel Kondisi Baik = inventaris alat - pengembalian dalam kondisi rusak - pengembalian dalam kondisi perbaikan yg tidak bisa di perbaiki + pengembalian dalam kondisi perbaikan yg selesai di perbaiki
                 calcConditionGoodQty() {
-                    return this.calcAvailableStockQty();
+                    let totalInv = this.calcTotalQtyAlat();
+                    let broken = 0;
+                    let repairUnfixable = 0;
+                    let repairCompletedGood = 0;
+
+                    this.borrowList.forEach(b => {
+                        if (b.returns) {
+                            b.returns.forEach(r => {
+                                let q = Number(r.qtyKembali) || 0;
+                                if (r.kondisi === 'rusak') broken += q;
+                                if (r.kondisi === 'perbaikan') {
+                                    if (r.statusPerbaikan === 'tidak bisa di perbaiki / rusak total') repairUnfixable += q;
+                                    if (r.statusPerbaikan === 'selesai di perbaiki') repairCompletedGood += q;
+                                }
+                            });
+                        }
+                    });
+
+                    return Math.max(0, totalInv - broken - repairUnfixable + repairCompletedGood);
                 },
 
                 calcBrokenRepairQty() {
@@ -1023,34 +1042,13 @@
                     return count;
                 },
 
+                // Panel Stok Tersedia = ambil data dari stok alat tersedia
                 calcAvailableStockQty() {
-                    let total = this.calcTotalQtyAlat();
-                    let borrowed = this.borrowList.reduce((acc, b) => acc + (Number(b.qty) || 0), 0);
-                    
-                    let returnedGood = 0;
-                    let returnedRepair = 0;
-                    let returnedBroken = 0;
-                    let repairCompletedGood = 0;
-                    let repairUnfixable = 0;
-
-                    this.borrowList.forEach(b => {
-                        if (b.returns) {
-                            b.returns.forEach(r => {
-                                let q = Number(r.qtyKembali) || 0;
-                                if (r.kondisi === 'baik') returnedGood += q;
-                                if (r.kondisi === 'rusak') returnedBroken += q;
-                                if (r.kondisi === 'perbaikan') {
-                                    returnedRepair += q;
-                                    if (r.statusPerbaikan === 'selesai di perbaiki') repairCompletedGood += q;
-                                    if (r.statusPerbaikan === 'tidak bisa di perbaiki / rusak total') repairUnfixable += q;
-                                }
-                            });
-                        }
+                    let totalAvailable = 0;
+                    this.stockReportList.forEach(s => {
+                        totalAvailable += (Number(s.tersedia) || 0);
                     });
-
-                    let effectiveBorrow = Math.max(0, borrowed - returnedGood - returnedRepair - returnedBroken);
-                    let res = total - effectiveBorrow - returnedBroken - repairUnfixable + repairCompletedGood;
-                    return Math.max(0, res);
+                    return totalAvailable;
                 },
 
                 get returnList() {
@@ -1142,7 +1140,7 @@
                     return this.inventoryList.map(i => ({ ...i, ket: 'Master Inventaris' }));
                 },
                 getConditionGoodTableData() {
-                    return this.stockReportList.filter(s => s.tersedia > 0).map(s => ({ ...s, qty: s.tersedia, ket: 'Tersedia di Gudang / Kondisi Baik' }));
+                    return this.stockReportList.filter(s => s.tersedia > 0).map(s => ({ ...s, qty: s.tersedia, ket: 'Kondisi Baik / Tersedia' }));
                 },
                 getBrokenRepairTableData() {
                     let rows = [];
