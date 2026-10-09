@@ -136,7 +136,7 @@
         </div>
 
         <div class="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">
-            LogistikPRO Cloud v2.7 &bull; Realtime Sync
+            LogistikPRO Cloud v2.8 &bull; Realtime Sync
         </div>
     </aside>
 
@@ -469,14 +469,14 @@
                                         <div class="space-y-1.5">
                                             <template x-for="(ret, rIdx) in (item.returns || [])" :key="rIdx">
                                                 <div class="flex items-center gap-2">
-                                                    <!-- Badge kondisi otomatis berubah menjadi BAIK atau RUSAK jika perbaikan telah diselesaikan -->
+                                                    <!-- Badge kondisi otomatis berganti menjadi BAIK atau RUSAK jika perbaikan selesai/rusak total -->
                                                     <span class="px-2 py-0.5 rounded text-[11px] font-semibold"
                                                           :class="{
-                                                              'bg-emerald-100 text-emerald-700': (ret.kondisi === 'baik') || (ret.kondisi === 'perbaikan' && ret.statusPerbaikan === 'selesai di perbaiki'),
+                                                              'bg-emerald-100 text-emerald-700': (ret.kondisi === 'baik') || (ret.statusPerbaikan === 'selesai di perbaiki'),
                                                               'bg-amber-100 text-amber-700': ret.kondisi === 'perbaikan' && (!ret.statusPerbaikan || ret.statusPerbaikan === 'Dalam Perbaikan'),
-                                                              'bg-rose-100 text-rose-700': (ret.kondisi === 'rusak') || (ret.kondisi === 'perbaikan' && ret.statusPerbaikan === 'tidak bisa di perbaiki / rusak total')
+                                                              'bg-rose-100 text-rose-700': (ret.kondisi === 'rusak') || (ret.statusPerbaikan === 'tidak bisa di perbaiki / rusak total')
                                                           }" 
-                                                          x-text="(ret.kondisi === 'perbaikan' && ret.statusPerbaikan === 'selesai di perbaiki') ? 'BAIK' : ((ret.kondisi === 'perbaikan' && ret.statusPerbaikan === 'tidak bisa di perbaiki / rusak total') ? 'RUSAK' : ret.kondisi.toUpperCase())">
+                                                          x-text="ret.statusPerbaikan === 'selesai di perbaiki' ? 'BAIK' : (ret.statusPerbaikan === 'tidak bisa di perbaiki / rusak total' ? 'RUSAK' : ret.kondisi.toUpperCase())">
                                                     </span>
                                                     
                                                     <template x-if="ret.kondisi === 'perbaikan'">
@@ -487,10 +487,10 @@
                                                                       'bg-emerald-100 text-emerald-700': ret.statusPerbaikan === 'selesai di perbaiki',
                                                                       'bg-rose-100 text-rose-700': ret.statusPerbaikan === 'tidak bisa di perbaiki / rusak total'
                                                                   }"
-                                                                  x-text="ret.statusPerbaikan === 'selesai di perbaiki' ? 'Selesai' : (ret.statusPerbaikan === 'tidak bisa di perbaiki / rusak total' ? 'Rusak Total' : (ret.statusPerbaikan || 'Dalam Perbaikan'))">
+                                                                  x-text="ret.statusPerbaikan === 'selesai di perbaiki' ? 'Selesai' : (ret.statusPerbaikan === 'tidak bisa di perbaiki / rusak total' ? 'Rusak Total' : 'Dalam Perbaikan')">
                                                             </span>
                                                             
-                                                            <!-- Tombol perbaikan otomatis hilang jika sudah selesai diperbaiki atau rusak total -->
+                                                            <!-- Tombol perbaikan otomatis hilang jika sudah selesai atau rusak total -->
                                                             <template x-if="!ret.statusPerbaikan || ret.statusPerbaikan === 'Dalam Perbaikan'">
                                                                 <button @click="openRepairModal(item, rIdx)" class="bg-purple-600 hover:bg-purple-700 text-white p-1 rounded text-[10px]" title="Proses Perbaikan">
                                                                     <i class="fa-solid fa-screwdriver-wrench"></i> Perbaikan
