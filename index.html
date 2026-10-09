@@ -30,9 +30,18 @@
         table th, table td {
             white-space: nowrap;
         }
+        /* Style untuk indikator pull to refresh */
+        #pullRefreshIndicator {
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
     </style>
 </head>
 <body class="bg-slate-100 font-sans text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- PULL TO REFRESH INDICATOR -->
+    <div id="pullRefreshIndicator" class="fixed top-0 inset-x-0 z-50 flex justify-center items-center h-12 bg-accent text-white text-sm font-medium shadow-md transform -translate-y-full opacity-0">
+        <i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Memperbarui data terbaru...
+    </div>
 
     <!-- TOP HEADER -->
     <header class="bg-slate-900 text-white shadow-md sticky top-0 z-40 flex items-center justify-between px-4 py-3">
@@ -86,7 +95,7 @@
         </aside>
 
         <!-- MAIN CONTENT AREA -->
-        <main class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 transition-all">
+        <main id="mainContainer" class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 transition-all">
             
             <!-- FITUR 1: DASHBOARD -->
             <section id="tab-dashboard" class="tab-content space-y-6">
@@ -97,7 +106,7 @@
                     </div>
                 </div>
 
-                <!-- Panel Cards (Klik untuk memunculkan modal rincian) -->
+                <!-- Panel Cards -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div onclick="openDetailModal('total_alat')" class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 cursor-pointer hover:border-accent transition group">
                         <div class="flex items-center justify-between">
@@ -326,7 +335,7 @@
         </main>
     </div>
 
-    <!-- MODAL FORM TAMBAH INVENTARIS -->
+    <!-- MODAL-MODAL (Inventaris, Pinjam, Pengembalian, Perbaikan, Detail) -->
     <div id="modalInventaris" class="fixed inset-0 z-50 bg-black/50 hidden flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-xl shadow-xl max-w-4xl w-full p-6 space-y-4 my-8">
             <div class="flex justify-between items-center border-b pb-3">
@@ -335,7 +344,7 @@
             </div>
             <form id="formInventaris" onsubmit="saveInventaris(event)" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Tanggal Pembelian (Sama untuk semua baris)</label>
+                    <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Tanggal Pembelian</label>
                     <input type="date" id="invTglPembelian" required class="w-full border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-accent outline-none">
                 </div>
                 <div class="overflow-x-auto">
@@ -363,7 +372,6 @@
         </div>
     </div>
 
-    <!-- MODAL FORM PEMINJAMAN -->
     <div id="modalPinjam" class="fixed inset-0 z-50 bg-black/50 hidden flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-xl shadow-xl max-w-4xl w-full p-6 space-y-4 my-8">
             <div class="flex justify-between items-center border-b pb-3">
@@ -406,7 +414,6 @@
         </div>
     </div>
 
-    <!-- MODAL PENGEMBALIAN -->
     <div id="modalPengembalian" class="fixed inset-0 z-50 bg-black/50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
             <div class="flex justify-between items-center border-b pb-3">
@@ -439,7 +446,6 @@
         </div>
     </div>
 
-    <!-- MODAL PERBAIKAN -->
     <div id="modalPerbaikan" class="fixed inset-0 z-50 bg-black/50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
             <div class="flex justify-between items-center border-b pb-3">
@@ -467,7 +473,6 @@
         </div>
     </div>
 
-    <!-- MODAL RINCIAN DASHBOARD -->
     <div id="modalDetail" class="fixed inset-0 z-50 bg-black/50 hidden flex items-center justify-center p-4 overflow-y-auto">
         <div class="bg-white rounded-xl shadow-xl max-w-5xl w-full p-6 space-y-4 my-8">
             <div class="flex justify-between items-center border-b pb-3">
@@ -489,9 +494,8 @@
     <!-- FIREBASE SDK & APP LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-        // Konfigurasi Firebase Proyek ArkPro
         const firebaseConfig = {
             apiKey: "AIzaSyASDID9jEZv0hTeFdN1rPx-eCFkH9Meghc",
             authDomain: "arkpro-cb4af.firebaseapp.com",
@@ -523,17 +527,15 @@
         let chartKondisiInstance = null;
         let chartStokInstance = null;
 
-        window.loadData = function() {
+        // Load awal dengan listener real-time
+        window.loadDataRealtime = function() {
             if (db) {
                 const dbRef = ref(db, 'inventaris_proyek/');
                 onValue(dbRef, (snapshot) => {
                     const val = snapshot.val();
                     if (val) {
                         window.appData = val;
-                        if(!window.appData.inventaris) window.appData.inventaris = [];
-                        if(!window.appData.peminjaman) window.appData.peminjaman = [];
-                        if(!window.appData.pengembalian) window.appData.pengembalian = [];
-                        if(!window.appData.perbaikan) window.appData.perbaikan = [];
+                        ensureDataStructure();
                     }
                     renderAll();
                 }, (error) => {
@@ -542,6 +544,39 @@
             } else {
                 loadFromLocal();
             }
+        }
+
+        // FUNGSI SMART REFRESH (Ambil data terbaru tanpa mereset UI/Tab awal)
+        window.smartRefresh = async function() {
+            const icon = document.getElementById('refreshIcon');
+            icon.classList.add('fa-spin');
+            
+            if (db) {
+                try {
+                    const dbRef = ref(db, 'inventaris_proyek/');
+                    const snapshot = await get(dbRef);
+                    if (snapshot.exists()) {
+                        window.appData = snapshot.val();
+                        ensureDataStructure();
+                    }
+                } catch (err) {
+                    console.error("Gagal refresh dari cloud:", err);
+                }
+            } else {
+                loadFromLocal();
+            }
+
+            renderAll();
+            setTimeout(() => {
+                icon.classList.remove('fa-spin');
+            }, 500);
+        }
+
+        function ensureDataStructure() {
+            if(!window.appData.inventaris) window.appData.inventaris = [];
+            if(!window.appData.peminjaman) window.appData.peminjaman = [];
+            if(!window.appData.pengembalian) window.appData.pengembalian = [];
+            if(!window.appData.perbaikan) window.appData.perbaikan = [];
         }
 
         window.saveDataCloud = function() {
@@ -557,23 +592,54 @@
             const local = localStorage.getItem('arkpro_inventaris_local');
             if (local) {
                 window.appData = JSON.parse(local);
+                ensureDataStructure();
             }
             renderAll();
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            window.loadData();
+            window.loadDataRealtime();
             initSidebar();
+            initPullToRefresh();
             setDefaultDates();
         });
 
-        window.smartRefresh = function() {
-            const icon = document.getElementById('refreshIcon');
-            icon.classList.add('fa-spin');
-            window.loadData();
-            setTimeout(() => {
-                icon.classList.remove('fa-spin');
-            }, 600);
+        // IMPLEMENTASI TARIK LAYAR (PULL TO REFRESH)
+        function initPullToRefresh() {
+            const container = document.getElementById('mainContainer');
+            const indicator = document.getElementById('pullRefreshIndicator');
+            let startY = 0;
+            let pulling = false;
+
+            container.addEventListener('touchstart', (e) => {
+                if (container.scrollTop === 0) {
+                    startY = e.touches[0].clientY;
+                    pulling = true;
+                }
+            }, { passive: true });
+
+            container.addEventListener('touchmove', (e) => {
+                if (!pulling) return;
+                const currentY = e.touches[0].clientY;
+                const diff = currentY - startY;
+
+                if (diff > 70 && diff < 150) {
+                    indicator.style.transform = `translateY(0px)`;
+                    indicator.style.opacity = '1';
+                }
+            }, { passive: true });
+
+            container.addEventListener('touchend', () => {
+                if (!pulling) return;
+                pulling = false;
+                
+                if (indicator.style.opacity === '1') {
+                    smartRefresh();
+                }
+                
+                indicator.style.transform = `translateY(-100%)`;
+                indicator.style.opacity = '0';
+            }, { passive: true });
         }
 
         function setDefaultDates() {
@@ -628,7 +694,7 @@
             overlay.addEventListener('click', closeSidebar);
         }
 
-        // INVENTARIS LOGIC
+        // --- INVENTARIS LOGIC ---
         window.openInventarisModal = function() {
             document.getElementById('invMultiBody').innerHTML = '';
             addInventarisRow();
@@ -720,7 +786,7 @@
             window.saveDataCloud();
         }
 
-        // PEMINJAMAN LOGIC
+        // --- PEMINJAMAN LOGIC ---
         window.openPinjamModal = function() {
             document.getElementById('pinjamMultiBody').innerHTML = '';
             addPinjamRow();
@@ -824,7 +890,7 @@
             }
         }
 
-        // PENGEMBALIAN & PERBAIKAN LOGIC
+        // --- PENGEMBALIAN & PERBAIKAN LOGIC ---
         window.openPengembalianModalForItem = function(pinjamId) {
             document.getElementById('kembaliPinjamId').value = pinjamId;
             document.getElementById('kembaliQty').value = 1;
@@ -930,7 +996,7 @@
             closePerbaikanModal();
         }
 
-        // STOK ALAT & REKONSILIASI
+        // --- STOK ALAT & REKONSILIASI ---
         function calculateStokSummary() {
             let map = {};
             window.appData.inventaris.forEach(inv => {
@@ -1017,7 +1083,7 @@
             });
         }
 
-        // DASHBOARD & PANEL RINCIAN KLIK
+        // --- DASHBOARD & PANEL RINCIAN KLIK ---
         function renderDashboard() {
             const stokData = calculateStokSummary();
             let totalQtyAlat = 0;
@@ -1123,7 +1189,7 @@
             document.getElementById('modalDetail').classList.add('hidden');
         }
 
-        // CHARTS
+        // --- CHARTS ---
         function renderCharts() {
             const stokData = calculateStokSummary();
             let totalBaik = 0, totalPerbaikan = 0, totalRusak = 0;
@@ -1173,7 +1239,7 @@
             });
         }
 
-        // EXPORT / IMPORT EXCEL & JSON
+        // --- EXPORT / IMPORT EXCEL & JSON ---
         window.exportToExcel = function() {
             const wb = XLSX.utils.book_new();
             
@@ -1229,8 +1295,7 @@
         window.importJSON = function(event) {
             const file = event.target.files[0];
             if(!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
+            const reader.onload = function(e) {
                 try {
                     const json = JSON.parse(e.target.result);
                     window.appData = json;
