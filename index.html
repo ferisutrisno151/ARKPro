@@ -47,7 +47,7 @@
                 <i class="fa-solid fa-bars"></i>
             </button>
             <span class="font-bold text-lg tracking-wider flex items-center gap-2">
-                <i class="fa-solid fa-boxes-stacked text-emerald-400"></i> LogistikPRO
+                <i class="fa-solid fa-boxes-stacked text-emerald-400"></i> ARKPRO
             </span>
         </div>
         <div class="flex items-center space-x-2">
@@ -71,7 +71,7 @@
                     <i class="fa-solid fa-warehouse"></i>
                 </div>
                 <div>
-                    <h2 class="font-bold text-white text-base">LogistikPRO</h2>
+                    <h2 class="font-bold text-white text-base">ARKPRO</h2>
                     <p class="text-xs text-slate-400">Manajemen Alat Proyek</p>
                 </div>
             </div>
@@ -151,8 +151,8 @@
         <div x-show="currentTab === 'dashboard'" x-cloak class="space-y-6">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <div>
-                    <h1 class="text-2xl font-bold text-slate-900">Dashboard Inventaris Alat</h1>
-                    <p class="text-sm text-slate-500">Ringkasan real-time kondisi dan status operasional alat proyek.</p>
+                    <h1 class="text-2xl font-bold text-slate-900">Dashboard</h1>
+                    <p class="text-sm text-slate-500">Interaktive.</p>
                 </div>
             </div>
 
@@ -168,7 +168,7 @@
                             <i class="fa-solid fa-boxes-stacked"></i>
                         </div>
                     </div>
-                    <p class="text-xs text-blue-600 font-medium mt-3 flex items-center gap-1">Klik untuk rincian <i class="fa-solid fa-arrow-right text-[10px]"></i></p>
+                    <p class="text-xs text-blue-600 font-medium mt-3 flex items-center gap-1">Rincian <i class="fa-solid fa-arrow-right text-[10px]"></i></p>
                 </div>
 
                 <div @click="openModalDetail('Kondisi Baik', getConditionGoodTableData())" class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 hover:shadow-md transition cursor-pointer group">
@@ -181,7 +181,7 @@
                             <i class="fa-solid fa-circle-check"></i>
                         </div>
                     </div>
-                    <p class="text-xs text-emerald-600 font-medium mt-3 flex items-center gap-1">Klik untuk rincian <i class="fa-solid fa-arrow-right text-[10px]"></i></p>
+                    <p class="text-xs text-emerald-600 font-medium mt-3 flex items-center gap-1">Rincian <i class="fa-solid fa-arrow-right text-[10px]"></i></p>
                 </div>
 
                 <div @click="openModalDetail('Rusak / Perbaikan', getBrokenRepairTableData())" class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 hover:shadow-md transition cursor-pointer group">
@@ -194,7 +194,7 @@
                             <i class="fa-solid fa-triangle-exclamation"></i>
                         </div>
                     </div>
-                    <p class="text-xs text-amber-600 font-medium mt-3 flex items-center gap-1">Klik untuk rincian <i class="fa-solid fa-arrow-right text-[10px]"></i></p>
+                    <p class="text-xs text-amber-600 font-medium mt-3 flex items-center gap-1">Rincian <i class="fa-solid fa-arrow-right text-[10px]"></i></p>
                 </div>
 
                 <div @click="openModalDetail('Stok Tersedia', getStockAvailableTableData())" class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 hover:shadow-md transition cursor-pointer group">
@@ -207,7 +207,7 @@
                             <i class="fa-solid fa-warehouse"></i>
                         </div>
                     </div>
-                    <p class="text-xs text-indigo-600 font-medium mt-3 flex items-center gap-1">Klik untuk rincian <i class="fa-solid fa-arrow-right text-[10px]"></i></p>
+                    <p class="text-xs text-indigo-600 font-medium mt-3 flex items-center gap-1">Rincian <i class="fa-solid fa-arrow-right text-[10px]"></i></p>
                 </div>
             </div>
 
@@ -220,7 +220,7 @@
                     </div>
                 </div>
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80">
-                    <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2"><i class="fa-solid fa-chart-pie text-indigo-600"></i> Grafik Donut Stok Alat</h3>
+                    <h3 class="font-bold text-slate-800 mb-4 flex items-center gap-2"><i class="fa-solid fa-chart-pie text-indigo-600"></i> Stok Alat</h3>
                     <div class="relative h-64 flex justify-center">
                         <canvas id="stockDonutChart"></canvas>
                     </div>
@@ -230,8 +230,8 @@
             <!-- DASHBOARD TABLE: RIWAYAT PEMINJAMAN TERBARU -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
                 <div class="p-5 border-b border-slate-100 flex items-center justify-between">
-                    <h3 class="font-bold text-slate-800"><i class="fa-solid fa-clock-rotate-left text-emerald-600 mr-2"></i> Aktivitas Peminjaman & Keterangan</h3>
-                    <span class="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-lg font-medium">Real-time Log</span>
+                    <h3 class="font-bold text-slate-800"><i class="fa-solid fa-clock-rotate-left text-emerald-600 mr-2"></i> Aktivitas Peminjaman Alat</h3>
+                    <span class="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-lg font-medium">Real-time</span>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse no-wrap-table">
@@ -286,8 +286,8 @@
         <div x-show="currentTab === 'inventory'" x-cloak class="space-y-6">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <h1 class="text-2xl font-bold text-slate-900">Alat Inventaris Gudang</h1>
-                    <p class="text-sm text-slate-500">Kelola master data seluruh equipment dan tools proyek.</p>
+                    <h1 class="text-2xl font-bold text-slate-900">Inventaris Alat</h1>
+                    <p class="text-sm text-slate-500">Data Masuk Alat.</p>
                 </div>
                 <button @click="openAddInventoryModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow-lg shadow-emerald-600/20 flex items-center gap-2 transition w-fit">
                     <i class="fa-solid fa-plus"></i> Tambah Inventaris Alat
@@ -347,7 +347,7 @@
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
                     <h1 class="text-2xl font-bold text-slate-900">Peminjaman & Pengembalian Alat</h1>
-                    <p class="text-sm text-slate-500">Catat transaksi peminjaman multi-item, pengembalian bertahap, dan status perbaikan.</p>
+                    <p class="text-sm text-slate-500">Transaksi Peminjaman & Pengembalian Alat.</p>
                 </div>
                 <button @click="openAddBorrowModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-sm font-semibold shadow-lg shadow-emerald-600/20 flex items-center gap-2 transition w-fit">
                     <i class="fa-solid fa-plus"></i> Form Peminjaman Alat
@@ -357,7 +357,7 @@
             <!-- 1. TABEL PEMINJAMAN -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
                 <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
-                    <h3 class="font-bold text-slate-800"><i class="fa-solid fa-arrow-right-arrow-left text-blue-600 mr-2"></i> Daftar Peminjaman Aktif</h3>
+                    <h3 class="font-bold text-slate-800"><i class="fa-solid fa-arrow-right-arrow-left text-blue-600 mr-2"></i> Daftar Peminjaman Alat</h3>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse no-wrap-table">
@@ -410,7 +410,7 @@
             <!-- 2. TABEL PENGEMBALIAN & PERBAIKAN -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
                 <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
-                    <h3 class="font-bold text-slate-800"><i class="fa-solid fa-rotate-left text-emerald-600 mr-2"></i> Daftar Pengembalian & Perbaikan Bertahap</h3>
+                    <h3 class="font-bold text-slate-800"><i class="fa-solid fa-rotate-left text-emerald-600 mr-2"></i> Daftar Pengembalian Alat</h3>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse no-wrap-table">
@@ -538,8 +538,8 @@
         <div x-show="currentTab === 'stock'" x-cloak class="space-y-6">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <h1 class="text-2xl font-bold text-slate-900">Stok Alat & Rekapitulasi Gudang</h1>
-                    <p class="text-sm text-slate-500">Laporan real-time ketersediaan alat, peminjaman, perbaikan, dan status rusak.</p>
+                    <h1 class="text-2xl font-bold text-slate-900">Stok Alat</h1>
+                    <p class="text-sm text-slate-500">Real-Time Ketersediaan Alat.</p>
                 </div>
             </div>
 
@@ -1123,7 +1123,7 @@
                             if (lastR.kondisi === 'baik') statusStr = 'Dikembalikan (Baik)';
                             else if (lastR.kondisi === 'rusak') statusStr = 'Dikembalikan (Rusak)';
                             else if (lastR.kondisi === 'perbaikan') {
-                                if (lastR.statusPerbaikan === 'selesai di perbaiki') statusStr = 'Dikembalikan (Baik - Selesai Perbaikan)';
+                                if (lastR.statusPerbaikan === 'selesai di perbaiki') statusStr = 'Dikembalikan (Baik)';
                                 else if (lastR.statusPerbaikan === 'tidak bisa di perbaiki / rusak total') statusStr = 'Dikembalikan (Rusak Total)';
                                 else statusStr = 'Perbaikan (Dalam Proses)';
                             }
