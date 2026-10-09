@@ -22,7 +22,6 @@
         .no-wrap-table th, .no-wrap-table td {
             white-space: nowrap;
         }
-        /* Custom Scrollbar for horizontal tables */
         ::-webkit-scrollbar {
             height: 8px;
             width: 8px;
@@ -66,7 +65,6 @@
 
     <aside class="fixed top-0 left-0 bottom-0 w-72 bg-slate-900 text-slate-300 z-50 shadow-2xl flex flex-col transform transition-transform duration-300 ease-in-out"
            :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'" x-cloak>
-        <!-- Sidebar Header -->
         <div class="p-5 border-b border-slate-800 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-emerald-500/30">
@@ -82,7 +80,6 @@
             </button>
         </div>
 
-        <!-- Sidebar Navigation Links -->
         <div class="flex-1 overflow-y-auto py-4 px-3 space-y-1.5">
             <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Menu Utama</p>
             
@@ -138,16 +135,14 @@
             </button>
         </div>
 
-        <!-- Sidebar Footer -->
         <div class="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">
-            LogistikPRO Cloud v2.5 &bull; Realtime Sync
+            LogistikPRO Cloud v2.6 &bull; Realtime Sync
         </div>
     </aside>
 
     <!-- MAIN CONTAINER -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6" @touchstart="touchStartY = $event.touches[0].clientY" @touchend="handlePullToRefresh($event)">
         
-        <!-- PULL TO REFRESH INDICATOR -->
         <div x-show="pullRefreshing" class="text-center py-2 text-emerald-600 font-medium text-sm flex items-center justify-center gap-2" x-cloak>
             <i class="fa-solid fa-spinner fa-spin"></i> Memperbarui data...
         </div>
@@ -163,7 +158,6 @@
 
             <!-- METRIC PANELS -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <!-- Panel 1: Total Alat -->
                 <div @click="openModalDetail('Total Alat', getInventoryTableData())" class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 hover:shadow-md transition cursor-pointer group">
                     <div class="flex items-center justify-between">
                         <div>
@@ -177,7 +171,6 @@
                     <p class="text-xs text-blue-600 font-medium mt-3 flex items-center gap-1">Klik untuk rincian <i class="fa-solid fa-arrow-right text-[10px]"></i></p>
                 </div>
 
-                <!-- Panel 2: Kondisi Baik -->
                 <div @click="openModalDetail('Kondisi Baik', getConditionGoodTableData())" class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 hover:shadow-md transition cursor-pointer group">
                     <div class="flex items-center justify-between">
                         <div>
@@ -191,7 +184,6 @@
                     <p class="text-xs text-emerald-600 font-medium mt-3 flex items-center gap-1">Klik untuk rincian <i class="fa-solid fa-arrow-right text-[10px]"></i></p>
                 </div>
 
-                <!-- Panel 3: Rusak / Perbaikan -->
                 <div @click="openModalDetail('Rusak / Perbaikan', getBrokenRepairTableData())" class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 hover:shadow-md transition cursor-pointer group">
                     <div class="flex items-center justify-between">
                         <div>
@@ -205,7 +197,6 @@
                     <p class="text-xs text-amber-600 font-medium mt-3 flex items-center gap-1">Klik untuk rincian <i class="fa-solid fa-arrow-right text-[10px]"></i></p>
                 </div>
 
-                <!-- Panel 4: Stok Alat Tersedia -->
                 <div @click="openModalDetail('Stok Tersedia', getStockAvailableTableData())" class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200/80 hover:shadow-md transition cursor-pointer group">
                     <div class="flex items-center justify-between">
                         <div>
@@ -303,7 +294,6 @@
                 </button>
             </div>
 
-            <!-- TABEL INVENTARIS -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse no-wrap-table">
@@ -453,7 +443,6 @@
                                     <td class="py-3.5 px-4 text-slate-500" x-text="item.sat"></td>
                                     <td class="py-3.5 px-4" x-text="item.lokasiKerja"></td>
                                     <td class="py-3.5 px-4">
-                                        <!-- Pengembalian bertahap bersusun -->
                                         <div class="space-y-1.5">
                                             <template x-for="(ret, rIdx) in (item.returns || [])" :key="rIdx">
                                                 <div class="bg-slate-50 p-1.5 rounded border border-slate-200 flex items-center justify-between gap-3 text-xs">
@@ -480,20 +469,34 @@
                                         <div class="space-y-1.5">
                                             <template x-for="(ret, rIdx) in (item.returns || [])" :key="rIdx">
                                                 <div class="flex items-center gap-2">
+                                                    <!-- Jika kondisi perbaikan sudah diselesaikan menjadi baik atau rusak total, badge kondisi otomatis berubah -->
                                                     <span class="px-2 py-0.5 rounded text-[11px] font-semibold"
                                                           :class="{
-                                                              'bg-emerald-100 text-emerald-700': ret.kondisi === 'baik',
-                                                              'bg-amber-100 text-amber-700': ret.kondisi === 'perbaikan',
-                                                              'bg-rose-100 text-rose-700': ret.kondisi === 'rusak'
-                                                          }" x-text="ret.kondisi.toUpperCase()"></span>
+                                                              'bg-emerald-100 text-emerald-700': (ret.kondisi === 'baik') || (ret.kondisi === 'perbaikan' && ret.statusPerbaikan === 'selesai di perbaiki'),
+                                                              'bg-amber-100 text-amber-700': ret.kondisi === 'perbaikan' && (!ret.statusPerbaikan || ret.statusPerbaikan === 'Dalam Perbaikan'),
+                                                              'bg-rose-100 text-rose-700': (ret.kondisi === 'rusak') || (ret.kondisi === 'perbaikan' && ret.statusPerbaikan === 'tidak bisa di perbaiki / rusak total')
+                                                          }" 
+                                                          x-text="(ret.kondisi === 'perbaikan' && ret.statusPerbaikan === 'selesai di perbaiki') ? 'BAIK' : ((ret.kondisi === 'perbaikan' && ret.statusPerbaikan === 'tidak bisa di perbaiki / rusak total') ? 'RUSAK' : ret.kondisi.toUpperCase())">
+                                                    </span>
                                                     
-                                                    <!-- Jika kondisi perbaikan, tampilkan status perbaikan atau tombol perbaikan -->
+                                                    <!-- Jika masih dalam perbaikan, tampilkan status dan tombol perbaikan. Jika sudah selesai/tidak bisa diperbaiki, tombol perbaikan otomatis hilang -->
                                                     <template x-if="ret.kondisi === 'perbaikan'">
                                                         <div class="flex items-center gap-1">
-                                                            <span class="text-[10px] bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded font-medium" x-text="ret.statusPerbaikan || 'Dalam Perbaikan'"></span>
-                                                            <button @click="openRepairModal(item, rIdx)" class="bg-purple-600 hover:bg-purple-700 text-white p-1 rounded text-[10px]" title="Proses Perbaikan">
-                                                                <i class="fa-solid fa-screwdriver-wrench"></i> Perbaikan
-                                                            </button>
+                                                            <span class="text-[10px] px-1.5 py-0.5 rounded font-medium"
+                                                                  :class="{
+                                                                      'bg-purple-100 text-purple-700': !ret.statusPerbaikan || ret.statusPerbaikan === 'Dalam Perbaikan',
+                                                                      'bg-emerald-100 text-emerald-700': ret.statusPerbaikan === 'selesai di perbaiki',
+                                                                      'bg-rose-100 text-rose-700': ret.statusPerbaikan === 'tidak bisa di perbaiki / rusak total'
+                                                                  }"
+                                                                  x-text="ret.statusPerbaikan || 'Dalam Perbaikan'">
+                                                            </span>
+                                                            
+                                                            <!-- Tombol Perbaikan hanya muncul jika belum final -->
+                                                            <template x-if="!ret.statusPerbaikan || ret.statusPerbaikan === 'Dalam Perbaikan'">
+                                                                <button @click="openRepairModal(item, rIdx)" class="bg-purple-600 hover:bg-purple-700 text-white p-1 rounded text-[10px]" title="Proses Perbaikan">
+                                                                    <i class="fa-solid fa-screwdriver-wrench"></i> Perbaikan
+                                                                </button>
+                                                            </template>
                                                         </div>
                                                     </template>
                                                 </div>
@@ -532,7 +535,6 @@
                 </div>
             </div>
 
-            <!-- TABEL STOK ALAT -->
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse no-wrap-table">
@@ -582,7 +584,6 @@
 
     <!-- ==================== MODALS ==================== -->
 
-    <!-- MODAL 1: DETAIL KLIK PANEL DASHBOARD -->
     <div x-show="modalDetailOpen" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
         <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[85vh] flex flex-col shadow-2xl overflow-hidden" @click.away="modalDetailOpen = false">
             <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
@@ -636,7 +637,6 @@
         </div>
     </div>
 
-    <!-- MODAL 2: FORM TAMBAH / EDIT INVENTARIS ALAT (MULTI-ITEM PER TANGGAL) -->
     <div x-show="modalInventoryOpen" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
         <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden" @click.away="modalInventoryOpen = false">
             <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
@@ -705,7 +705,6 @@
         </div>
     </div>
 
-    <!-- MODAL 3: FORM PEMINJAMAN ALAT (MULTI-ITEM PER TANGGAL & PEMINJAM) -->
     <div x-show="modalBorrowOpen" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
         <div class="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden" @click.away="modalBorrowOpen = false">
             <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
@@ -781,7 +780,6 @@
         </div>
     </div>
 
-    <!-- MODAL 4: POP-UP PENGEMBALIAN ALAT -->
     <div x-show="modalReturnOpen" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
         <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden" @click.away="modalReturnOpen = false">
             <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
@@ -823,7 +821,6 @@
         </div>
     </div>
 
-    <!-- MODAL 5: POP-UP PERBAIKAN -->
     <div x-show="modalRepairOpen" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm" x-cloak>
         <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden" @click.away="modalRepairOpen = false">
             <div class="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
@@ -857,9 +854,6 @@
 
     <!-- ==================== JAVASCRIPT & FIREBASE CONFIG ==================== -->
     <script>
-        // =========================================================================
-        // PENTING: Masukkan konfigurasi Firebase Project Anda di bawah ini
-        // =========================================================================
         const firebaseConfig = {
             apiKey: "AIzaSyD-YOUR_API_KEY_HERE",
             authDomain: "your-project-id.firebaseapp.com",
@@ -869,7 +863,6 @@
             appId: "1:1234567890:web:abcdef"
         };
 
-        // Inisialisasi Firebase
         let db = null;
         let useFirebase = false;
         try {
@@ -894,27 +887,22 @@
                 touchStartY: 0,
                 pullRefreshing: false,
 
-                // State Data Master
                 inventoryList: [],
                 borrowList: [],
 
-                // Charts
                 conditionChartInstance: null,
                 stockDonutChartInstance: null,
 
-                // Modal Detail Dashboard
                 modalDetailOpen: false,
                 modalDetailTitle: '',
                 modalDetailRows: [],
 
-                // Modal Inventaris Form
                 modalInventoryOpen: false,
                 inventoryEditMode: false,
                 currentEditInvId: null,
                 invFormTgl: new Date().toISOString().split('T')[0],
                 invFormRows: [{ noInventaris: '', kategori: '', namaTool: '', brand: '', qty: 1, sat: 'Pcs' }],
 
-                // Modal Peminjaman Form
                 modalBorrowOpen: false,
                 borrowEditMode: false,
                 currentEditBorrowId: null,
@@ -922,22 +910,19 @@
                 borrowFormPeminjam: '',
                 borrowFormRows: [{ noInventaris: '', namaTool: '', brandSatInfo: '', qty: 1, lokasiKerja: '', sat: 'Pcs' }],
 
-                // Modal Pengembalian
                 modalReturnOpen: false,
                 activeReturnItem: null,
-                activeReturnIndex: null, // Jika edit existing return entry
+                activeReturnIndex: null,
                 returnFormTgl: new Date().toISOString().split('T')[0],
                 returnFormQty: 1,
                 returnFormKondisi: 'baik',
 
-                // Modal Perbaikan
                 modalRepairOpen: false,
                 activeRepairItem: null,
                 activeRepairIndex: null,
                 repairFormTgl: new Date().toISOString().split('T')[0],
                 repairFormStatus: 'selesai di perbaiki',
 
-                // INIT APP
                 initApp() {
                     this.loadData();
                     this.$watch('currentTab', (val) => {
@@ -947,7 +932,6 @@
                     });
                 },
 
-                // LOAD DATA (Firebase / LocalStorage)
                 loadData() {
                     if (useFirebase && db) {
                         this.syncStatus = 'Syncing...';
@@ -1012,39 +996,17 @@
                     }
                 },
 
-                // ================= CALCULATIONS & GETTERS =================
+                // ================= CALCULATIONS & GETTERS (Sesuai Permintaan Baru) =================
                 calcTotalQtyAlat() {
                     return this.inventoryList.reduce((acc, item) => acc + (Number(item.qty) || 0), 0);
                 },
 
-                // Logic Kondisi Baik = Total Inventaris - Dipinjam + Dikembalikan Baik + Selesai Perbaikan (Baik) - Rusak Total
+                // Panel Kondisi Baik = Inventaris - Peminjaman - Perbaikan Aktif - Rusak + Selesai Perbaikan - Rusak Total
                 calcConditionGoodQty() {
-                    let total = this.calcTotalQtyAlat();
-                    let borrowed = this.borrowList.reduce((acc, b) => acc + (Number(b.qty) || 0), 0);
-                    
-                    let returnedGood = 0;
-                    let repairCompletedGood = 0;
-                    let totalBrokenOrUnfixable = 0;
-
-                    this.borrowList.forEach(b => {
-                        if (b.returns) {
-                            b.returns.forEach(r => {
-                                if (r.kondisi === 'baik') returnedGood += (Number(r.qtyKembali) || 0);
-                                if (r.kondisi === 'perbaikan') {
-                                    if (r.statusPerbaikan === 'selesai di perbaiki') repairCompletedGood += (Number(r.qtyKembali) || 0);
-                                    if (r.statusPerbaikan === 'tidak bisa di perbaiki / rusak total') totalBrokenOrUnfixable += (Number(r.qtyKembali) || 0);
-                                }
-                                if (r.kondisi === 'rusak') totalBrokenOrUnfixable += (Number(r.qtyKembali) || 0);
-                            });
-                        }
-                    });
-
-                    // Rumus sesuai prompt: inventaris alat - peminjaman + pengembalian dalam kondisi baik + perbaikan selesai kembali baik - rusak/tidak bisa diperbaiki
-                    let res = total - borrowed + returnedGood + repairCompletedGood - totalBrokenOrUnfixable;
-                    return Math.max(0, res);
+                    return this.calcAvailableStockQty();
                 },
 
-                // Rusak / Perbaikan = Pengembalian kondisi rusak + pengembalian perbaikan tidak bisa diperbaiki + yang sedang dalam perbaikan
+                // Panel Rusak / Perbaikan = Pengembalian kondisi rusak + perbaikan tidak bisa diperbaiki + perbaikan aktif
                 calcBrokenRepairQty() {
                     let count = 0;
                     this.borrowList.forEach(b => {
@@ -1064,12 +1026,38 @@
                     return count;
                 },
 
-                // Stok Alat / Tersedia = Inventaris - Peminjaman - Perbaikan Aktif - Rusak + Selesai Perbaikan - Rusak Total
                 calcAvailableStockQty() {
-                    return this.calcConditionGoodQty();
+                    let total = this.calcTotalQtyAlat();
+                    let borrowed = this.borrowList.reduce((acc, b) => acc + (Number(b.qty) || 0), 0);
+                    
+                    let returnedGood = 0;
+                    let returnedRepair = 0;
+                    let returnedBroken = 0;
+                    let repairCompletedGood = 0;
+                    let repairUnfixable = 0;
+
+                    this.borrowList.forEach(b => {
+                        if (b.returns) {
+                            b.returns.forEach(r => {
+                                let q = Number(r.qtyKembali) || 0;
+                                if (r.kondisi === 'baik') returnedGood += q;
+                                if (r.kondisi === 'rusak') returnedBroken += q;
+                                if (r.kondisi === 'perbaikan') {
+                                    returnedRepair += q;
+                                    if (r.statusPerbaikan === 'selesai di perbaiki') repairCompletedGood += q;
+                                    if (r.statusPerbaikan === 'tidak bisa di perbaiki / rusak total') repairUnfixable += q;
+                                }
+                            });
+                        }
+                    });
+
+                    // Rumus Alat Tersedia: inventaris alat - peminjaman - pengembalian kondisi rusak - pengembalian perbaikan tidak bisa diperbaiki + pengembalian perbaikan selesai diperbaiki
+                    // (Catatan: pengembalian kondisi baik / sudah dikembalikan juga otomatis memperkecil sisa peminjaman bersih)
+                    let effectiveBorrow = Math.max(0, borrowed - returnedGood - returnedRepair - returnedBroken);
+                    let res = total - effectiveBorrow - returnedBroken - repairUnfixable + repairCompletedGood;
+                    return Math.max(0, res);
                 },
 
-                // ================= REPORT LISTS & TABLES =================
                 get returnList() {
                     return this.borrowList;
                 },
@@ -1077,34 +1065,49 @@
                 get stockReportList() {
                     return this.inventoryList.map(inv => {
                         let totalAlat = Number(inv.qty) || 0;
-                        let dipinjam = 0;
+                        let rawBorrow = 0;
+                        let rawReturned = 0;
                         let perbaikan = 0;
                         let rusak = 0;
+                        let selesaiBaik = 0;
+                        let rusakTotal = 0;
 
                         this.borrowList.filter(b => b.noInventaris === inv.noInventaris).forEach(b => {
-                            dipinjam += Number(b.qty) || 0;
+                            rawBorrow += Number(b.qty) || 0;
                             if (b.returns) {
                                 b.returns.forEach(r => {
-                                    if (r.kondisi === 'baik') {
-                                        // Sudah dikembalikan baik
-                                    } else if (r.kondisi === 'rusak') {
-                                        rusak += Number(r.qtyKembali) || 0;
+                                    let q = Number(r.qtyKembali) || 0;
+                                    rawReturned += q;
+                                    if (r.kondisi === 'rusak') {
+                                        rusak += q;
                                     } else if (r.kondisi === 'perbaikan') {
                                         if (!r.statusPerbaikan || r.statusPerbaikan === 'Dalam Perbaikan') {
-                                            perbaikan += Number(r.qtyKembali) || 0;
-                                        } else if (r.statusPerbaikan === 'tidak bisa di perbaiki / rusak total') {
-                                            rusak += Number(r.qtyKembali) || 0;
-                                            // qty perbaikan menjadi kosong/0
+                                            perbaikan += q;
                                         } else if (r.statusPerbaikan === 'selesai di perbaiki') {
-                                            // qty perbaikan menjadi kosong/0, kembali ke baik
+                                            selesaiBaik += q;
+                                            // Qty perbaikan berkurang sesuai tindakan (menjadi kosong/0)
+                                        } else if (r.statusPerbaikan === 'tidak bisa di perbaiki / rusak total') {
+                                            rusakTotal += q;
+                                            rusak += q; // Qty rusak bertambah
+                                            // Qty perbaikan berkurang menjadi kosong/0
                                         }
                                     }
                                 });
                             }
                         });
 
-                        // Rumus Alat Tersedia: Inventaris - Peminjaman - Perbaikan - Rusak + Selesai Perbaikan - Rusak Total
-                        let tersedia = totalAlat - dipinjam - perbaikan - rusak;
+                        // 1. Kolom Dipinjam: Qty pinjam dikurangi total yang sudah dikembalikan dengan kondisi apapun
+                        let dipinjam = Math.max(0, rawBorrow - rawReturned);
+
+                        // 2. Kolom Perbaikan: Hanya menyisakan yang statusnya masih "Dalam Perbaikan" (yang sudah selesai/tidak bisa diperbaiki qty berkurang/kosong)
+                        let netPerbaikan = Math.max(0, perbaikan);
+
+                        // 3. Kolom Rusak: Pengembalian rusak + perbaikan tidak bisa diperbaiki
+                        let netRusak = rusak;
+
+                        // 4. Kolom Alat Tersedia: Inventaris - Peminjaman - Rusak - Perbaikan Tidak Bisa Diperbaiki + Perbaikan Selesai Baik
+                        let tersedia = totalAlat - dipinjam - netRusak - netPerbaikan;
+
                         return {
                             tglUpdate: new Date().toISOString().split('T')[0],
                             kategori: inv.kategori,
@@ -1113,8 +1116,8 @@
                             brand: inv.brand,
                             totalAlat: totalAlat,
                             dipinjam: dipinjam,
-                            perbaikan: perbaikan,
-                            rusak: rusak,
+                            perbaikan: netPerbaikan,
+                            rusak: netRusak,
                             tersedia: Math.max(0, tersedia)
                         };
                     });
@@ -1126,8 +1129,13 @@
                         let statusStr = 'Dipinjam';
                         if (b.returns && b.returns.length > 0) {
                             let lastR = b.returns[b.returns.length - 1];
-                            statusStr = `Dikembalikan (${lastR.kondisi})`;
-                            if (lastR.kondisi === 'perbaikan') statusStr = `Perbaikan (${lastR.statusPerbaikan || 'Proses'})`;
+                            if (lastR.kondisi === 'baik') statusStr = 'Dikembalikan (Baik)';
+                            else if (lastR.kondisi === 'rusak') statusStr = 'Dikembalikan (Rusak)';
+                            else if (lastR.kondisi === 'perbaikan') {
+                                if (lastR.statusPerbaikan === 'selesai di perbaiki') statusStr = 'Dikembalikan (Baik - Selesai Perbaikan)';
+                                else if (lastR.statusPerbaikan === 'tidak bisa di perbaiki / rusak total') statusStr = 'Dikembalikan (Rusak Total)';
+                                else statusStr = 'Perbaikan (Dalam Proses)';
+                            }
                         }
                         logs.push({
                             tglPinjam: b.tglPinjam,
@@ -1149,7 +1157,7 @@
                     return this.inventoryList.map(i => ({ ...i, ket: 'Master Inventaris' }));
                 },
                 getConditionGoodTableData() {
-                    return this.stockReportList.filter(s => s.tersedia > 0).map(s => ({ ...s, qty: s.tersedia, ket: 'Tersedia di Gudang' }));
+                    return this.stockReportList.filter(s => s.tersedia > 0).map(s => ({ ...s, qty: s.tersedia, ket: 'Tersedia di Gudang / Kondisi Baik' }));
                 },
                 getBrokenRepairTableData() {
                     let rows = [];
@@ -1157,15 +1165,17 @@
                         if (b.returns) {
                             b.returns.forEach(r => {
                                 if (r.kondisi === 'rusak' || r.kondisi === 'perbaikan') {
-                                    rows.push({
-                                        noInventaris: b.noInventaris,
-                                        kategori: b.kategori || '-',
-                                        namaTool: b.namaTool,
-                                        brand: b.brand,
-                                        qty: r.qtyKembali,
-                                        sat: b.sat,
-                                        ket: `Kondisi: ${r.kondisi} (${r.statusPerbaikan || 'Dalam Perbaikan'})`
-                                    });
+                                    if (!r.statusPerbaikan || r.statusPerbaikan === 'Dalam Perbaikan' || r.statusPerbaikan === 'tidak bisa di perbaiki / rusak total' || r.kondisi === 'rusak') {
+                                        rows.push({
+                                            noInventaris: b.noInventaris,
+                                            kategori: b.kategori || '-',
+                                            namaTool: b.namaTool,
+                                            brand: b.brand,
+                                            qty: r.qtyKembali,
+                                            sat: b.sat,
+                                            ket: `Status: ${r.kondisi.toUpperCase()} (${r.statusPerbaikan || 'Dalam Perbaikan'})`
+                                        });
+                                    }
                                 }
                             });
                         }
@@ -1474,11 +1484,10 @@
                     this.updateChartsAndLogs();
                 },
 
-                // ================= EXPORT & IMPORT EXCEL / JSON =================
+                // ================= EXPORT & IMPORT =================
                 exportToExcel() {
                     let wb = XLSX.utils.book_new();
 
-                    // Sheet 1: Inventaris
                     let invData = this.inventoryList.map((i, idx) => ({
                         No: idx + 1,
                         'Tgl Pembelian': i.tglPembelian,
@@ -1492,7 +1501,6 @@
                     let wsInv = XLSX.utils.json_to_sheet(invData);
                     XLSX.utils.book_append_sheet(wb, wsInv, "Alat Inventaris");
 
-                    // Sheet 2: Peminjaman
                     let borData = this.borrowList.map((b, idx) => ({
                         No: idx + 1,
                         'Tgl Pinjam': b.tglPinjam,
@@ -1507,7 +1515,6 @@
                     let wsBor = XLSX.utils.json_to_sheet(borData);
                     XLSX.utils.book_append_sheet(wb, wsBor, "Peminjaman");
 
-                    // Sheet 3: Stok
                     let stockData = this.stockReportList.map((s, idx) => ({
                         No: idx + 1,
                         'Tgl Update': s.tglUpdate,
@@ -1534,8 +1541,6 @@
                     reader.onload = (e) => {
                         let data = new Uint8Array(e.target.result);
                         let workbook = XLSX.read(data, { type: 'array' });
-                        
-                        // Ambil sheet pertama untuk inventaris
                         let firstSheetName = workbook.SheetNames[0];
                         let worksheet = workbook.Sheets[firstSheetName];
                         let json = XLSX.utils.sheet_to_json(worksheet);
@@ -1609,7 +1614,7 @@
                     alert("Aplikasi LogistikPRO ini berbasis Web App (PWA). Anda dapat menyimpannya ke Layar Utama perangkat (Add to Home Screen) melalui menu browser Anda atau menggunakannya langsung secara online.");
                 },
 
-                // ================= CHARTS RENDER =================
+                // ================= CHARTS =================
                 updateChartsAndLogs() {
                     if (this.currentTab === 'dashboard') {
                         setTimeout(() => this.renderCharts(), 100);
@@ -1617,7 +1622,6 @@
                 },
 
                 renderCharts() {
-                    // 1. Condition Chart
                     const ctxCond = document.getElementById('conditionChart');
                     if (ctxCond) {
                         if (this.conditionChartInstance) this.conditionChartInstance.destroy();
@@ -1647,7 +1651,6 @@
                         });
                     }
 
-                    // 2. Stock Donut Chart
                     const ctxDonut = document.getElementById('stockDonutChart');
                     if (ctxDonut) {
                         if (this.stockDonutChartInstance) this.stockDonutChartInstance.destroy();
