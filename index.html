@@ -136,7 +136,7 @@
         </div>
 
         <div class="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">
-            LogistikPRO Cloud v3.1 &bull; Realtime Sync
+            LogistikPRO Cloud v3.2 &bull; Realtime Sync
         </div>
     </aside>
 
@@ -500,7 +500,7 @@
                                                         </template>
                                                     </div>
 
-                                                    <!-- Tanggal Update Perbaikan Saja (Keterangan Dihilangkan) -->
+                                                    <!-- Tanggal Update Perbaikan Saja -->
                                                     <template x-if="ret.tglUpdatePerbaikan">
                                                         <div class="text-[11px] text-slate-500 pt-0.5 border-t border-slate-200/60 flex items-center gap-1">
                                                             <i class="fa-regular fa-calendar-days text-purple-600"></i>
@@ -1600,7 +1600,7 @@
                     alert("Aplikasi LogistikPRO ini berbasis Web App (PWA). Anda dapat menyimpannya ke Layar Utama perangkat (Add to Home Screen) melalui menu browser Anda atau menggunakannya langsung secara online.");
                 },
 
-                updateChartsAndLogs() {
+                    updateChartsAndLogs() {
                     if (this.currentTab === 'dashboard') {
                         setTimeout(() => this.renderCharts(), 100);
                     }
