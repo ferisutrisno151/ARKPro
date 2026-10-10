@@ -93,10 +93,7 @@
                 <div class="pt-4 pb-2 border-t border-slate-800 mt-2">
                     <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Sistem & Bagikan</p>
                     <button onclick="shareLink()" class="w-full flex items-center px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 hover:text-white transition text-left"><i class="fa-solid fa-share-nodes w-8 text-sky-400"></i>Share Link</button>
-                    <a href="https://ferisutrisno151.github.io/ARKPro/ARKPro.apk" download="ARKPro.apk" class="w-full text-left sidebar-link flex items-center px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 text-slate-300">
-    <i class="fa-solid fa-download mr-3 text-purple-400"></i>
-    <span>Download Link / APK</span>
-</a>
+                    <button onclick="downloadApp()" class="w-full flex items-center px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 hover:text-white transition text-left"><i class="fa-solid fa-download w-8 text-purple-400"></i>Download Link / APK</button>
                 </div>
             </nav>
         </aside>
@@ -1440,8 +1437,8 @@
         }
 
         window.downloadApp = function() {
-        window.location.href = 'https://ferisutrisno151.github.io/ARKPro/ARKPro.apk';
-    };
-</script>
+            alert("Untuk mendownload aplikasi atau shortcut APK:\n1. Buka halaman ini melalui browser Chrome di HP Android.\n2. Klik menu titik tiga di kanan atas.\n3. Pilih 'Tambahkan ke Layar Utama' (Add to Home Screen) agar dapat diakses layaknya aplikasi mobile.");
+        }
+    </script>
 </body>
 </html>
