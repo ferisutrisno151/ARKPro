@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Inventaris Alat Proyek - ArkPro</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -42,19 +42,19 @@
     </div>
 
     <!-- TOP HEADER -->
-    <header class="bg-slate-900 text-white shadow-md flex-none z-40 flex items-center justify-between px-4 py-3">
-        <div class="flex items-center space-x-3">
-            <button id="sidebarToggle" class="text-white hover:text-accent focus:outline-none text-xl p-1">
+    <header class="bg-slate-900 text-white shadow-md flex-none z-40 flex items-center justify-between px-3 py-2.5 sm:px-4 sm:py-3">
+        <div class="flex items-center space-x-2 sm:space-x-3 min-w-0">
+            <button id="sidebarToggle" class="text-white hover:text-accent focus:outline-none text-xl p-1 flex-none">
                 <i class="fa-solid fa-bars"></i>
             </button>
-            <h1 class="text-lg font-bold tracking-wide">Inventaris Alat Proyek (ArkPro)</h1>
+            <h1 class="text-base sm:text-lg font-bold tracking-wide truncate">Inventaris Alat Proyek (ArkPro)</h1>
         </div>
-        <div class="flex items-center space-x-2">
-            <button onclick="smartRefresh()" title="Refresh Data" class="bg-slate-800 hover:bg-slate-700 text-white px-3 py-1.5 rounded text-sm flex items-center space-x-1 transition">
+        <div class="flex items-center space-x-1.5 sm:space-x-2 flex-none">
+            <button onclick="smartRefresh()" title="Refresh Data" class="bg-slate-800 hover:bg-slate-700 text-white px-2.5 py-1 sm:px-3 sm:py-1.5 rounded text-xs sm:text-sm flex items-center space-x-1 transition">
                 <i class="fa-solid fa-rotate" id="refreshIcon"></i>
                 <span class="hidden sm:inline">Refresh</span>
             </button>
-            <span id="syncStatus" class="text-xs bg-emerald-600 text-white px-2 py-1 rounded">Terhubung Cloud</span>
+            <span id="syncStatus" class="text-[10px] sm:text-xs bg-emerald-600 text-white px-1.5 py-1 sm:px-2 rounded whitespace-nowrap">Terhubung Cloud</span>
         </div>
     </header>
 
@@ -517,7 +517,6 @@
         let chartKondisiInstance = null;
         let chartStokInstance = null;
 
-        // Load lokal dahulu
         function loadFromLocal() {
             const local = localStorage.getItem('arkpro_firestore_local');
             if (local) {
@@ -582,10 +581,8 @@
         }
 
         window.saveDataCloud = async function() {
-            // 1. Simpan lokal HP
             localStorage.setItem('arkpro_firestore_local', JSON.stringify(window.appData));
             
-            // 2. Simpan ke Cloud Firestore
             if (db) {
                 try {
                     await setDoc(doc(db, "inventaris_proyek", "data_utama"), window.appData);
@@ -1006,6 +1003,7 @@
                     noInventaris: inv.noInventaris,
                     nama: inv.nama,
                     brand: inv.brand,
+                    satuan: inv.satuan || 'Unit',
                     tglUpdate: inv.tglPembelian,
                     totalAlat: inv.qty,
                     dipinjam: 0,
@@ -1072,6 +1070,12 @@
             });
         }
 
+        // Helper untuk mendapatkan Kategori dari Master Inventaris berdasarkan No Inventaris
+        function getKategoriByNoInv(noInv) {
+            const match = window.appData.inventaris.find(i => i.noInventaris === noInv);
+            return match ? match.kategori : '-';
+        }
+
         // --- DASHBOARD & PANEL RINCIAN KLIK ---
         function renderDashboard() {
             const stokData = calculateStokSummary();
@@ -1096,35 +1100,57 @@
 
             const tbody = document.getElementById('tableDashboardBody');
             tbody.innerHTML = '';
+            
+            // Riwayat Peminjaman Aktif
             window.appData.peminjaman.forEach((p, idx) => {
+                const kat = getKategoriByNoInv(p.noInventaris);
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50">
                         <td class="px-4 py-3">${idx + 1}</td>
                         <td class="px-4 py-3">${p.tglPinjam}</td>
                         <td class="px-4 py-3 font-semibold">${p.namaPeminjam}</td>
                         <td class="px-4 py-3">${p.noInventaris}</td>
-                        <td class="px-4 py-3">-</td>
+                        <td class="px-4 py-3">${kat}</td>
                         <td class="px-4 py-3">${p.namaEquipment}</td>
                         <td class="px-4 py-3">${p.brandType}</td>
                         <td class="px-4 py-3">${p.qty}</td>
-                        <td class="px-4 py-3">${p.satuan}</td>
+                        <td class="px-4 py-3">${p.satuan || 'Unit'}</td>
                         <td class="px-4 py-3"><span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-semibold">Dipinjam</span></td>
                     </tr>
                 `;
             });
+
+            // Riwayat Pengembalian & Status Update Perbaikan Dinamis
             window.appData.pengembalian.forEach((k, idx) => {
+                const kat = getKategoriByNoInv(k.noInventaris);
+                let badgeKeterangan = '';
+
+                if (k.kondisiKembali === 'perbaikan') {
+                    if (k.statusPerbaikan === 'pending') {
+                        badgeKeterangan = `<span class="bg-amber-100 text-amber-800 px-2 py-1 rounded text-xs font-semibold">Dikembalikan (perbaikan)</span>`;
+                    } else if (k.statusPerbaikan === 'selesai_perbaikan') {
+                        badgeKeterangan = `<span class="bg-emerald-100 text-emerald-800 px-2 py-1 rounded text-xs font-semibold">Selesai Diperbaiki (Kembali Baik)</span>`;
+                    } else if (k.statusPerbaikan === 'rusak_total') {
+                        badgeKeterangan = `<span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-semibold">Rusak Total</span>`;
+                    }
+                } else if (k.kondisiKembali === 'rusak') {
+                    badgeKeterangan = `<span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-semibold">Dikembalikan (rusak)</span>`;
+                } else {
+                    badgeKeterangan = `<span class="bg-emerald-100 text-emerald-800 px-2 py-1 rounded text-xs font-semibold">Dikembalikan (${k.kondisiKembali})</span>`;
+                }
+
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50">
                         <td class="px-4 py-3">${window.appData.peminjaman.length + idx + 1}</td>
                         <td class="px-4 py-3">${k.tglPinjam}</td>
                         <td class="px-4 py-3 font-semibold">${k.namaPeminjam}</td>
                         <td class="px-4 py-3">${k.noInventaris}</td>
-                        <td class="px-4 py-3">-</td>
+                        <td class="px-4 py-3">${kat}</td>
                         <td class="px-4 py-3">${k.namaEquipment}</td>
                         <td class="px-4 py-3">${k.brandType}</td>
                         <td class="px-4 py-3">${k.qtyKembali}</td>
-                        <td class="px-4 py-3">${k.satuan}</td>
-                        <td class="px-4 py-3"><span class="bg-emerald-100 text-emerald-800 px-2 py-1 rounded text-xs font-semibold">Dikembalikan (${k.kondisiKembali})</span></td>
+                        <td class="px-4 py-3">${k.satuan || 'Unit'}</td>
+                        <td class="px-4 py-3">${badgeKeterangan}</td>
                     </tr>
                 `;
             });
@@ -1141,7 +1167,7 @@
                 title.innerText = "Rincian Total Alat Inventaris";
                 head.innerHTML = `<tr><th class="p-3">No</th><th class="p-3">No Inv</th><th class="p-3">Nama Alat</th><th class="p-3">Brand</th><th class="p-3">Qty</th><th class="p-3">Satuan</th></tr>`;
                 window.appData.inventaris.forEach((i, idx) => {
-                    body.innerHTML += `<tr><td class="p-3">${idx+1}</td><td class="p-3">${i.noInventaris}</td><td class="p-3">${i.nama}</td><td class="p-3">${i.brand}</td><td class="p-3 font-bold">${i.qty}</td><td class="p-3">${i.satuan}</td></tr>`;
+                    body.innerHTML += `<tr><td class="p-3">${idx+1}</td><td class="p-3">${i.noInventaris}</td><td class="p-3">${i.nama}</td><td class="p-3">${i.brand}</td><td class="p-3 font-bold">${i.qty}</td><td class="p-3">${i.satuan || 'Unit'}</td></tr>`;
                 });
             } else if(type === 'kondisi_baik') {
                 title.innerText = "Rincian Alat Kondisi Baik";
@@ -1167,7 +1193,7 @@
                 head.innerHTML = `<tr><th class="p-3">No</th><th class="p-3">No Inv</th><th class="p-3">Nama Alat</th><th class="p-3">Tersedia</th><th class="p-3">Satuan</th></tr>`;
                 const stok = calculateStokSummary();
                 stok.forEach((s, idx) => {
-                    body.innerHTML += `<tr><td class="p-3">${idx+1}</td><td class="p-3">${s.noInventaris}</td><td class="p-3">${s.nama}</td><td class="p-3 font-bold text-indigo-600">${s.tersedia}</td><td class="p-3">-</td></tr>`;
+                    body.innerHTML += `<tr><td class="p-3">${idx+1}</td><td class="p-3">${s.noInventaris}</td><td class="p-3">${s.nama}</td><td class="p-3 font-bold text-indigo-600">${s.tersedia}</td><td class="p-3">${s.satuan}</td></tr>`;
                 });
             }
 
