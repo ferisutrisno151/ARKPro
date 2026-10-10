@@ -49,7 +49,7 @@
             <button id="sidebarToggle" class="text-white hover:text-accent focus:outline-none text-lg p-1 flex-none">
                 <i class="fa-solid fa-bars"></i>
             </button>
-            <h1 class="text-xs sm:text-sm font-bold tracking-wide truncate">Inventaris Alat Proyek (ArkPro)</h1>
+            <h1 class="text-xs sm:text-sm font-bold tracking-wide truncate">ArkPro</h1>
         </div>
         <div class="flex items-center space-x-1.5 flex-none">
             <button onclick="exportToExcel()" title="Export Excel" class="bg-emerald-700 hover:bg-emerald-600 text-white px-2 py-1 rounded text-[10px] sm:text-xs flex items-center space-x-1 transition">
@@ -74,7 +74,7 @@
         <!-- SIDEBAR -->
         <aside id="sidebar" class="absolute inset-y-0 left-0 z-50 w-64 bg-slate-900 text-slate-300 transform -translate-x-full transition-transform duration-300 ease-in-out flex flex-col shadow-2xl">
             <div class="p-4 border-b border-slate-800 flex items-center justify-between flex-none">
-                <span class="text-white font-bold text-lg"><i class="fa-solid fa-boxes-stacked mr-2 text-accent"></i>Menu Utama</span>
+                <span class="text-white font-bold text-lg"><i class="fa-solid fa-boxes-stacked mr-2 text-accent"></i>Monitoring system</span>
                 <button id="sidebarClose" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-xl"></i></button>
             </div>
             
@@ -99,10 +99,10 @@
 </a>
                 </div>
             </nav>
-                    <div class="p-4 text-center text-xs text-slate-500 border-t border-slate-800 mt-auto">
-    Created 💻 By <strong>Feri Sutrisno</strong>
-</div>
-        </aside>
+            <div class="p-4 text-center text-xs text-slate-500 border-t border-slate-800 flex-none bg-slate-900">
+        Created 💻 By <strong class="text-slate-300 font-semibold">Feri Sutrisno</strong>
+      </div>
+        </aside>        
 
         <!-- MAIN CONTENT AREA -->
         <main id="mainContainer" class="flex-1 overflow-y-auto p-3 sm:p-5 lg:p-6 space-y-4 sm:space-y-6">
@@ -110,8 +110,8 @@
             <!-- FITUR 1: DASHBOARD -->
             <section id="tab-dashboard" class="tab-content space-y-4 sm:space-y-6">
                 <div>
-                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">Dashboard Inventaris</h2>
-                    <p class="text-xs sm:text-sm text-slate-500">Ringkasan kondisi dan pergerakan alat proyek secara real-time.</p>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">Dashboard</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">Interaktive.</p>
                 </div>
 
                 <!-- Panel Cards -->
@@ -208,8 +208,8 @@
             <section id="tab-inventaris" class="tab-content space-y-4 sm:space-y-6 hidden">
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
-                        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">Alat Inventaris</h2>
-                        <p class="text-xs sm:text-sm text-slate-500">Kelola master data seluruh alat dan equipment proyek.</p>
+                        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">Inventaris Alat</h2>
+                        <p class="text-xs sm:text-sm text-slate-500">Data Inventaris.</p>
                     </div>
                     <button onclick="openInventarisModal()" class="bg-accent hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-xs sm:text-sm font-medium shadow-sm transition flex items-center justify-center space-x-2">
                         <i class="fa-solid fa-plus"></i><span>Tambah Alat Inventaris</span>
@@ -243,7 +243,7 @@
                 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
                         <h2 class="text-xl sm:text-2xl font-bold text-slate-900">Peminjaman & Pengembalian</h2>
-                        <p class="text-xs sm:text-sm text-slate-500">Monitor sirkulasi peminjaman, pengembalian bertahap, dan perbaikan alat.</p>
+                        <p class="text-xs sm:text-sm text-slate-500">Transaksi Real-Time.</p>
                     </div>
                     <button onclick="openPinjamModal()" class="bg-accent hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-xs sm:text-sm font-medium shadow-sm transition flex items-center justify-center space-x-2">
                         <i class="fa-solid fa-hand-holding"></i><span>Form Peminjaman</span>
@@ -279,7 +279,7 @@
                 <!-- Tabel Pengembalian -->
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                     <div class="p-3 sm:p-4 border-b border-slate-200 bg-slate-50">
-                        <h3 class="font-bold text-slate-800 text-xs sm:text-sm">Daftar Pengembalian & Riwayat Bertahap</h3>
+                        <h3 class="font-bold text-slate-800 text-xs sm:text-sm">Daftar Riwayat Pengembalian</h3>
                     </div>
                     <div class="overflow-x-auto">
                         <table class="w-full text-left text-xs sm:text-sm text-slate-600">
@@ -309,8 +309,8 @@
             <!-- FITUR 4: STOK ALAT -->
             <section id="tab-stok" class="tab-content space-y-4 sm:space-y-6 hidden">
                 <div>
-                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">Stok Alat & Rekonsiliasi</h2>
-                    <p class="text-xs sm:text-sm text-slate-500">Perhitungan otomatis total, peminjaman, perbaikan, rusak, dan ketersediaan gudang.</p>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">Stok Alat</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">Real-Time.</p>
                 </div>
 
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
