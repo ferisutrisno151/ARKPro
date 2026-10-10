@@ -985,7 +985,7 @@
             closePerbaikanModal();
         }
 
-        // --- STOK ALAT & REKONSILIASI (DIPERBAIKI) ---
+        // --- STOK ALAT & REKONSILIASI (DIPERBAIKI TANPA MERUBAH DATA LAMA) ---
         function calculateStokSummary() {
             let map = {};
             window.appData.inventaris.forEach(inv => {
@@ -1003,40 +1003,11 @@
                 };
             });
 
-            // Hitung total awal yang sedang dipinjam
-            window.appData.peminjaman.forEach(p => {
-                if(map[p.noInventaris]) {
-                    map[p.noInventaris].dipinjam += p.qty;
-                }
-            });
-
-            // Kurangi qty di kolom pinjam berdasarkan total barang yang sudah dikembalikan (kondisi apapun)
-            window.appData.pengembalian.forEach(k => {
-                if(map[k.noInventaris]) {
-                    // Setiap pengembalian mengurangi jumlah aktif di kolom dipinjam
-                    map[k.noInventaris].dipinjam -= k.qtyKembali;
-                    if(map[k.noInventaris].dipinjam < 0) map[k.noInventaris].dipinjam = 0;
-
-                    // Klasifikasikan berdasarkan kondisi kembalinya
-                    if(k.kondisiKembali === 'perbaikan') {
-                        if(k.statusPerbaikan === 'pending') {
-                            map[k.noInventaris].perbaikan += k.qtyKembali;
-                        } else if(k.statusPerbaikan === 'rusak_total') {
-                            map[k.noInventaris].rusak += k.qtyKembali;
-                        } else if(k.statusPerbaikan === 'selesai_perbaikan') {
-                            // Selesai diperbaiki kembali baik ke gudang (tersedia)
-                        }
-                    } else if(k.kondisiKembali === 'rusak') {
-                        map[k.noInventaris].rusak += k.qtyKembali;
-                    }
-                }
-            });
-
-            // Hitung ulang ketersediaan alat di gudang
+            // Kalkulasi perhitungan akurat berdasarkan data yang ada
             Object.keys(map).forEach(key => {
                 let item = map[key];
                 
-                // Kalkulasi akurat per item inventaris
+                // Total awal dipinjam
                 let totalPinjamAwal = 0;
                 window.appData.peminjaman.filter(p => p.noInventaris === key).forEach(p => totalPinjamAwal += p.qty);
 
@@ -1054,13 +1025,15 @@
                     }
                 });
 
+                // Qty dipinjam aktif berkurang setelah dikembalikan (dengan kondisi apapun)
                 let sisaDipinjam = totalPinjamAwal - qtyKembaliTotal;
                 if(sisaDipinjam < 0) sisaDipinjam = 0;
 
                 item.dipinjam = sisaDipinjam;
                 item.perbaikan = currentPerbaikanQty;
                 item.rusak = currentRusakQty;
-                // Tersedia = Total - DipinjamAktif - Perbaikan - Rusak
+                
+                // Alat Tersedia = Total - DipinjamAktif - Perbaikan - Rusak
                 item.tersedia = item.totalAlat - item.dipinjam - item.perbaikan - item.rusak;
                 if(item.tersedia < 0) item.tersedia = 0;
             });
