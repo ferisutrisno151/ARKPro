@@ -1534,11 +1534,15 @@
           }
         } else if (data.status === "REJECTED") {
           if (checkInterval) clearInterval(checkInterval);
+          // Hapus sesi agar terkunci
           localStorage.removeItem("arkpro_session_id");
           localStorage.removeItem("arkpro_session_time");
+          
+          // SEMBUNYIKAN FORM INPUT, KUNCI TOTAL DI PESAN DITOLAK
+          document.getElementById("authFormArea").classList.add("hidden");
           document.getElementById("authWaitingArea").classList.add("hidden");
-          document.getElementById("authFormArea").classList.remove("hidden");
-          document.getElementById("authStatusText").innerText = "Akses Ditolak oleh Admin. Silakan ajukan ulang dengan nama lain.";
+          document.getElementById("authStatusTextinnerHTML") = ""; // opsional
+          document.getElementById("authStatusText").innerHTML = "<span class='text-red-400 font-bold'>Akses Ditolak oleh Admin.<br>Silakan tutup aplikasi atau hubungi Admin.</span>";
           document.getElementById("authModal").classList.remove("hidden");
         } else if (data.status === "EXPIRED") {
           if (checkInterval) clearInterval(checkInterval);
