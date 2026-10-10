@@ -483,26 +483,25 @@
         </div>
     </div>
 
-    <!-- FIREBASE SDK & APP LOGIC -->
+    <!-- FIREBASE FIRESTORE SDK & APP LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyASDID9jEZv0hTeFdN1rPx-eCFkH9Meghc",
             authDomain: "arkpro-cb4af.firebaseapp.com",
-            databaseURL: "https://arkpro-cb4af-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "arkpro-cb4af",
             storageBucket: "arkpro-cb4af.firebasestorage.app",
             messagingSenderId: "1043039688353",
             appId: "1:1043039688353:web:c74d010e7187cfd10842e0"
         };
 
-        let db;
+        let db = null;
         try {
             const app = initializeApp(firebaseConfig);
-            db = getDatabase(app);
-            document.getElementById('syncStatus').innerText = "Terhubung Cloud (ArkPro)";
+            db = getFirestore(app);
+            document.getElementById('syncStatus').innerText = "Terhubung Cloud (Firestore)";
         } catch (e) {
             document.getElementById('syncStatus').innerText = "Mode Offline (Local)";
             document.getElementById('syncStatus').className = "text-xs bg-amber-600 text-white px-2 py-1 rounded";
@@ -518,21 +517,36 @@
         let chartKondisiInstance = null;
         let chartStokInstance = null;
 
-        window.loadDataRealtime = function() {
+        // Load lokal dahulu
+        function loadFromLocal() {
+            const local = localStorage.getItem('arkpro_firestore_local');
+            if (local) {
+                try {
+                    window.appData = JSON.parse(local);
+                    ensureDataStructure();
+                } catch(err) {
+                    console.error("Gagal parse local storage", err);
+                }
+            }
+            renderAll();
+        }
+
+        window.loadDataRealtime = async function() {
+            loadFromLocal();
+
             if (db) {
-                const dbRef = ref(db, 'inventaris_proyek/');
-                onValue(dbRef, (snapshot) => {
-                    const val = snapshot.val();
-                    if (val) {
-                        window.appData = val;
+                try {
+                    const docRef = doc(db, "inventaris_proyek", "data_utama");
+                    const docSnap = await getDoc(docRef);
+                    if (docSnap.exists()) {
+                        window.appData = docSnap.data();
                         ensureDataStructure();
+                        localStorage.setItem('arkpro_firestore_local', JSON.stringify(window.appData));
+                        renderAll();
                     }
-                    renderAll();
-                }, (error) => {
-                    loadFromLocal();
-                });
-            } else {
-                loadFromLocal();
+                } catch (err) {
+                    console.warn("Gagal ambil dari Cloud Firestore, menggunakan data lokal:", err);
+                }
             }
         }
 
@@ -542,19 +556,18 @@
             
             if (db) {
                 try {
-                    const dbRef = ref(db, 'inventaris_proyek/');
-                    const snapshot = await get(dbRef);
-                    if (snapshot.exists()) {
-                        window.appData = snapshot.val();
+                    const docRef = doc(db, "inventaris_proyek", "data_utama");
+                    const docSnap = await getDoc(docRef);
+                    if (docSnap.exists()) {
+                        window.appData = docSnap.data();
                         ensureDataStructure();
+                        localStorage.setItem('arkpro_firestore_local', JSON.stringify(window.appData));
                     }
                 } catch (err) {
-                    console.error("Gagal refresh:", err);
+                    console.error("Gagal refresh dari Firestore:", err);
                 }
-            } else {
-                loadFromLocal();
             }
-
+            
             renderAll();
             setTimeout(() => {
                 icon.classList.remove('fa-spin');
@@ -568,20 +581,17 @@
             if(!window.appData.perbaikan) window.appData.perbaikan = [];
         }
 
-        window.saveDataCloud = function() {
+        window.saveDataCloud = async function() {
+            // 1. Simpan lokal HP
+            localStorage.setItem('arkpro_firestore_local', JSON.stringify(window.appData));
+            
+            // 2. Simpan ke Cloud Firestore
             if (db) {
-                const dbRef = ref(db, 'inventaris_proyek/');
-                set(dbRef, window.appData).catch(err => console.error(err));
-            }
-            localStorage.setItem('arkpro_inventaris_local', JSON.stringify(window.appData));
-            renderAll();
-        }
-
-        function loadFromLocal() {
-            const local = localStorage.getItem('arkpro_inventaris_local');
-            if (local) {
-                window.appData = JSON.parse(local);
-                ensureDataStructure();
+                try {
+                    await setDoc(doc(db, "inventaris_proyek", "data_utama"), window.appData);
+                } catch (err) {
+                    console.error("Gagal menyimpan ke Cloud Firestore:", err);
+                }
             }
             renderAll();
         }
@@ -655,7 +665,9 @@
                 el.classList.remove('bg-accent', 'text-white');
                 el.classList.add('hover:bg-slate-800', 'hover:text-white');
             });
-            event.currentTarget.classList.add('bg-accent', 'text-white');
+            if(event && event.currentTarget) {
+                event.currentTarget.classList.add('bg-accent', 'text-white');
+            }
             closeSidebarMobile();
             document.getElementById('mainContainer').scrollTop = 0;
         }
@@ -985,7 +997,7 @@
             closePerbaikanModal();
         }
 
-        // --- STOK ALAT & REKONSILIASI (DIPERBAIKI TANPA MERUBAH DATA LAMA) ---
+        // --- STOK ALAT & REKONSILIASI ---
         function calculateStokSummary() {
             let map = {};
             window.appData.inventaris.forEach(inv => {
@@ -1003,11 +1015,9 @@
                 };
             });
 
-            // Kalkulasi perhitungan akurat berdasarkan data yang ada
             Object.keys(map).forEach(key => {
                 let item = map[key];
                 
-                // Total awal dipinjam
                 let totalPinjamAwal = 0;
                 window.appData.peminjaman.filter(p => p.noInventaris === key).forEach(p => totalPinjamAwal += p.qty);
 
@@ -1025,7 +1035,6 @@
                     }
                 });
 
-                // Qty dipinjam aktif berkurang setelah dikembalikan (dengan kondisi apapun)
                 let sisaDipinjam = totalPinjamAwal - qtyKembaliTotal;
                 if(sisaDipinjam < 0) sisaDipinjam = 0;
 
@@ -1033,7 +1042,6 @@
                 item.perbaikan = currentPerbaikanQty;
                 item.rusak = currentRusakQty;
                 
-                // Alat Tersedia = Total - DipinjamAktif - Perbaikan - Rusak
                 item.tersedia = item.totalAlat - item.dipinjam - item.perbaikan - item.rusak;
                 if(item.tersedia < 0) item.tersedia = 0;
             });
