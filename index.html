@@ -1437,8 +1437,14 @@
         }
 
         window.downloadApp = function() {
-            alert("Untuk mendownload aplikasi atau shortcut APK:\n1. Buka halaman ini melalui browser Chrome di HP Android.\n2. Klik menu titik tiga di kanan atas.\n3. Pilih 'Tambahkan ke Layar Utama' (Add to Home Screen) agar dapat diakses layaknya aplikasi mobile.");
-        }
+    const apkUrl = 'https://ferisutrisno151.github.io/ARKPro/ARKPro.apk'; 
+    const anchor = document.createElement('a');
+    anchor.href = apkUrl;
+    anchor.download = 'ARKPro.apk';
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+}
     </script>
 </body>
 </html>
