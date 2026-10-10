@@ -49,20 +49,13 @@
             </button>
             <h1 class="text-xs sm:text-sm font-bold tracking-wide truncate">Inventaris Alat Proyek (ArkPro)</h1>
         </div>
-        <div class="flex items-center space-x-1 flex-none">
+        <div class="flex items-center space-x-1.5 flex-none">
             <button onclick="exportToExcel()" title="Export Excel" class="bg-emerald-700 hover:bg-emerald-600 text-white px-2 py-1 rounded text-[10px] sm:text-xs flex items-center space-x-1 transition">
                 <i class="fa-solid fa-file-excel"></i><span class="hidden md:inline">Export Excel</span>
             </button>
             <label title="Import Excel" class="bg-emerald-800 hover:bg-emerald-700 text-white px-2 py-1 rounded text-[10px] sm:text-xs flex items-center space-x-1 transition cursor-pointer">
                 <i class="fa-solid fa-file-arrow-down"></i><span class="hidden md:inline">Import Excel</span>
                 <input type="file" id="importExcelFile" accept=".xlsx, .xls, .csv" class="hidden" onchange="importFromExcel(event)">
-            </label>
-            <button onclick="exportJSON()" title="Export JSON" class="bg-amber-700 hover:bg-amber-600 text-white px-2 py-1 rounded text-[10px] sm:text-xs flex items-center space-x-1 transition">
-                <i class="fa-solid fa-file-code"></i><span class="hidden md:inline">JSON</span>
-            </button>
-            <label title="Import JSON" class="bg-amber-800 hover:bg-amber-700 text-white px-2 py-1 rounded text-[10px] sm:text-xs flex items-center space-x-1 transition cursor-pointer">
-                <i class="fa-solid fa-file-arrow-up"></i>
-                <input type="file" id="importJSONFile" accept=".json" class="hidden" onchange="importJSON(event)">
             </label>
             <button onclick="smartRefresh()" title="Refresh Data" class="bg-slate-800 hover:bg-slate-700 text-white px-2 py-1 rounded text-xs flex items-center space-x-1 transition">
                 <i class="fa-solid fa-rotate" id="refreshIcon"></i>
@@ -89,6 +82,12 @@
                 <a href="#" onclick="switchTab('peminjaman')" class="sidebar-link flex items-center px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-slate-800 hover:text-white transition"><i class="fa-solid fa-right-left w-8"></i>Peminjaman & Pengembalian</a>
                 <a href="#" onclick="switchTab('stok')" class="sidebar-link flex items-center px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-slate-800 hover:text-white transition"><i class="fa-solid fa-warehouse w-8"></i>Stok Alat</a>
                 
+                <div class="pt-4 pb-2 border-t border-slate-800 mt-2">
+                    <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Manajemen Data</p>
+                    <button onclick="exportJSON()" class="w-full flex items-center px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 hover:text-white transition text-left"><i class="fa-solid fa-file-code w-8 text-amber-400"></i>Export JSON</button>
+                    <label class="w-full flex items-center px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 hover:text-white transition cursor-pointer"><i class="fa-solid fa-file-arrow-up w-8 text-amber-400"></i>Import JSON<input type="file" id="importJSONFile" accept=".json" class="hidden" onchange="importJSON(event)"></label>
+                </div>
+
                 <div class="pt-4 pb-2 border-t border-slate-800 mt-2">
                     <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Sistem & Bagikan</p>
                     <button onclick="shareLink()" class="w-full flex items-center px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 hover:text-white transition text-left"><i class="fa-solid fa-share-nodes w-8 text-sky-400"></i>Share Link</button>
@@ -1254,11 +1253,10 @@
             });
         }
 
-        // --- EXPORT / IMPORT EXCEL & JSON (Urutan Kolom Sesuai Tabel) ---
+        // --- EXPORT / IMPORT EXCEL & JSON ---
         window.exportToExcel = function() {
             const wb = XLSX.utils.book_new();
             
-            // 1. Inventaris Alat (Urutan: tglPembelian, noInventaris, kategori, nama, brand, qty, satuan)
             const mappedInventaris = window.appData.inventaris.map((item, idx) => ({
                 "No": idx + 1,
                 "Tgl Pembelian": item.tglPembelian,
@@ -1272,7 +1270,6 @@
             const wsInventaris = XLSX.utils.json_to_sheet(mappedInventaris);
             XLSX.utils.book_append_sheet(wb, wsInventaris, "Inventaris Alat");
 
-            // 2. Peminjaman (Urutan: tglPinjam, namaPeminjam, noInventaris, namaEquipment, brandType, qty, satuan, lokasiKerja)
             const mappedPeminjaman = window.appData.peminjaman.map((item, idx) => ({
                 "No": idx + 1,
                 "Tgl Pinjam": item.tglPinjam,
@@ -1287,25 +1284,36 @@
             const wsPeminjaman = XLSX.utils.json_to_sheet(mappedPeminjaman);
             XLSX.utils.book_append_sheet(wb, wsPeminjaman, "Peminjaman");
 
-            // 3. Pengembalian (Urutan: tglPinjam, namaPeminjam, noInventaris, namaEquipment, brandType, qtyPinjam, satuan, lokasiKerja, tglKembali, qtyKembali, kondisiKembali)
-            const mappedPengembalian = window.appData.pengembalian.map((item, idx) => ({
-                "No": idx + 1,
-                "Tgl Pinjam": item.tglPinjam,
-                "Nama Peminjam": item.namaPeminjam,
-                "No Inventaris": item.noInventaris,
-                "Nama Equipment / Tool": item.namaEquipment,
-                "Brand / Type": item.brandType,
-                "Qty Pinjam": item.qtyPinjam,
-                "Sat": item.satuan,
-                "Lokasi Kerja": item.lokasiKerja,
-                "Tgl Kembali": item.tglKembali,
-                "Qty Kembali": item.qtyKembali,
-                "Kondisi Kembali": item.kondisiKembali
-            }));
+            const mappedPengembalian = window.appData.pengembalian.map((item, idx) => {
+                let kondisiFinal = item.kondisiKembali;
+                if (item.kondisiKembali === 'perbaikan') {
+                    if (item.statusPerbaikan === 'selesai_perbaikan') kondisiFinal = 'Selesai Diperbaiki (Kembali Baik)';
+                    else if (item.statusPerbaikan === 'rusak_total') kondisiFinal = 'Rusak Total';
+                    else kondisiFinal = 'Dikembalikan (perbaikan)';
+                } else if (item.kondisiKembali === 'rusak') {
+                    kondisiFinal = 'Dikembalikan (rusak)';
+                } else {
+                    kondisiFinal = 'Dikembalikan (' + item.kondisiKembali + ')';
+                }
+
+                return {
+                    "No": idx + 1,
+                    "Tgl Pinjam": item.tglPinjam,
+                    "Nama Peminjam": item.namaPeminjam,
+                    "No Inventaris": item.noInventaris,
+                    "Nama Equipment / Tool": item.namaEquipment,
+                    "Brand / Type": item.brandType,
+                    "Qty Pinjam": item.qtyPinjam,
+                    "Sat": item.satuan,
+                    "Lokasi Kerja": item.lokasiKerja,
+                    "Tgl Kembali": item.tglKembali,
+                    "Qty Kembali": item.qtyKembali,
+                    "Kondisi Kembali": kondisiFinal
+                };
+            });
             const wsPengembalian = XLSX.utils.json_to_sheet(mappedPengembalian);
             XLSX.utils.book_append_sheet(wb, wsPengembalian, "Pengembalian");
 
-            // 4. Stok Alat (Urutan: tglUpdate, kategori, noInventaris, nama, brand, totalAlat, dipinjam, perbaikan, rusak, tersedia)
             const rawStok = calculateStokSummary();
             const mappedStok = rawStok.map((item, idx) => ({
                 "No": idx + 1,
@@ -1375,7 +1383,7 @@
                         lokasiKerja: x["Lokasi Kerja"] || '',
                         tglKembali: x["Tgl Kembali"] || '',
                         qtyKembali: parseInt(x["Qty Kembali"]) || 1,
-                        kondisiKembali: x["Kondisi Kembali"] || 'baik',
+                        kondisiKembali: 'baik',
                         statusPerbaikan: 'selesai'
                     }));
                 }
