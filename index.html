@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=0.85, minimum-scale=0.5, maximum-scale=2.0">
+    <meta name="viewport" content="width=device-width, initial-scale=0.85, minimum-scale=0.5, maximum-scale=2.0">
     <title>Inventaris Alat Proyek - ArkPro</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -37,24 +37,37 @@
 <body class="bg-slate-100 font-sans text-slate-800 antialiased h-screen flex flex-col overflow-hidden">
 
     <!-- PULL TO REFRESH INDICATOR -->
-    <div id="pullRefreshIndicator" class="fixed top-0 inset-x-0 z-50 flex justify-center items-center h-12 bg-accent text-white text-sm font-medium shadow-md transform -translate-y-full opacity-0">
+    <div id="pullRefreshIndicator" class="fixed top-0 inset-x-0 z-50 flex justify-center items-center h-10 bg-accent text-white text-xs font-medium shadow-md transform -translate-y-full opacity-0">
         <i class="fa-solid fa-circle-notch fa-spin mr-2"></i> Memperbarui data terbaru...
     </div>
 
     <!-- TOP HEADER -->
-    <header class="bg-slate-900 text-white shadow-md flex-none z-40 flex items-center justify-between px-3 py-2.5 sm:px-4 sm:py-3">
-        <div class="flex items-center space-x-2 sm:space-x-3 min-w-0">
-            <button id="sidebarToggle" class="text-white hover:text-accent focus:outline-none text-xl p-1 flex-none">
+    <header class="bg-slate-900 text-white shadow-md flex-none z-40 flex items-center justify-between px-3 py-2">
+        <div class="flex items-center space-x-2 min-w-0">
+            <button id="sidebarToggle" class="text-white hover:text-accent focus:outline-none text-lg p-1 flex-none">
                 <i class="fa-solid fa-bars"></i>
             </button>
-            <h1 class="text-base sm:text-lg font-bold tracking-wide truncate">Inventaris Alat Proyek (ArkPro)</h1>
+            <h1 class="text-xs sm:text-sm font-bold tracking-wide truncate">Inventaris Alat Proyek (ArkPro)</h1>
         </div>
-        <div class="flex items-center space-x-1.5 sm:space-x-2 flex-none">
-            <button onclick="smartRefresh()" title="Refresh Data" class="bg-slate-800 hover:bg-slate-700 text-white px-2.5 py-1 sm:px-3 sm:py-1.5 rounded text-xs sm:text-sm flex items-center space-x-1 transition">
+        <div class="flex items-center space-x-1 flex-none">
+            <button onclick="exportToExcel()" title="Export Excel" class="bg-emerald-700 hover:bg-emerald-600 text-white px-2 py-1 rounded text-[10px] sm:text-xs flex items-center space-x-1 transition">
+                <i class="fa-solid fa-file-excel"></i><span class="hidden md:inline">Export Excel</span>
+            </button>
+            <label title="Import Excel" class="bg-emerald-800 hover:bg-emerald-700 text-white px-2 py-1 rounded text-[10px] sm:text-xs flex items-center space-x-1 transition cursor-pointer">
+                <i class="fa-solid fa-file-arrow-down"></i><span class="hidden md:inline">Import Excel</span>
+                <input type="file" id="importExcelFile" accept=".xlsx, .xls, .csv" class="hidden" onchange="importFromExcel(event)">
+            </label>
+            <button onclick="exportJSON()" title="Export JSON" class="bg-amber-700 hover:bg-amber-600 text-white px-2 py-1 rounded text-[10px] sm:text-xs flex items-center space-x-1 transition">
+                <i class="fa-solid fa-file-code"></i><span class="hidden md:inline">JSON</span>
+            </button>
+            <label title="Import JSON" class="bg-amber-800 hover:bg-amber-700 text-white px-2 py-1 rounded text-[10px] sm:text-xs flex items-center space-x-1 transition cursor-pointer">
+                <i class="fa-solid fa-file-arrow-up"></i>
+                <input type="file" id="importJSONFile" accept=".json" class="hidden" onchange="importJSON(event)">
+            </label>
+            <button onclick="smartRefresh()" title="Refresh Data" class="bg-slate-800 hover:bg-slate-700 text-white px-2 py-1 rounded text-xs flex items-center space-x-1 transition">
                 <i class="fa-solid fa-rotate" id="refreshIcon"></i>
                 <span class="hidden sm:inline">Refresh</span>
             </button>
-            <span id="syncStatus" class="text-[10px] sm:text-xs bg-emerald-600 text-white px-1.5 py-1 sm:px-2 rounded whitespace-nowrap">Terhubung Cloud</span>
         </div>
     </header>
 
@@ -76,14 +89,6 @@
                 <a href="#" onclick="switchTab('peminjaman')" class="sidebar-link flex items-center px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-slate-800 hover:text-white transition"><i class="fa-solid fa-right-left w-8"></i>Peminjaman & Pengembalian</a>
                 <a href="#" onclick="switchTab('stok')" class="sidebar-link flex items-center px-3 py-2.5 rounded-lg text-sm font-medium hover:bg-slate-800 hover:text-white transition"><i class="fa-solid fa-warehouse w-8"></i>Stok Alat</a>
                 
-                <div class="pt-4 pb-2 border-t border-slate-800 mt-4">
-                    <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Manajemen Data</p>
-                    <button onclick="exportToExcel()" class="w-full flex items-center px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 hover:text-white transition text-left"><i class="fa-solid fa-file-excel w-8 text-emerald-400"></i>Export ke Excel</button>
-                    <label class="w-full flex items-center px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 hover:text-white transition cursor-pointer"><i class="fa-solid fa-file-arrow-down w-8 text-emerald-400"></i>Import dari Excel<input type="file" id="importExcelFile" accept=".xlsx, .xls, .csv" class="hidden" onchange="importFromExcel(event)"></label>
-                    <button onclick="exportJSON()" class="w-full flex items-center px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 hover:text-white transition text-left"><i class="fa-solid fa-file-code w-8 text-amber-400"></i>Export JSON</button>
-                    <label class="w-full flex items-center px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 hover:text-white transition cursor-pointer"><i class="fa-solid fa-file-arrow-up w-8 text-amber-400"></i>Import JSON<input type="file" id="importJSONFile" accept=".json" class="hidden" onchange="importJSON(event)"></label>
-                </div>
-
                 <div class="pt-4 pb-2 border-t border-slate-800 mt-2">
                     <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Sistem & Bagikan</p>
                     <button onclick="shareLink()" class="w-full flex items-center px-3 py-2 rounded-lg text-sm font-medium hover:bg-slate-800 hover:text-white transition text-left"><i class="fa-solid fa-share-nodes w-8 text-sky-400"></i>Share Link</button>
@@ -93,60 +98,60 @@
         </aside>
 
         <!-- MAIN CONTENT AREA -->
-        <main id="mainContainer" class="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-6">
+        <main id="mainContainer" class="flex-1 overflow-y-auto p-3 sm:p-5 lg:p-6 space-y-4 sm:space-y-6">
             
             <!-- FITUR 1: DASHBOARD -->
-            <section id="tab-dashboard" class="tab-content space-y-6">
+            <section id="tab-dashboard" class="tab-content space-y-4 sm:space-y-6">
                 <div>
-                    <h2 class="text-2xl font-bold text-slate-900">Dashboard Inventaris</h2>
-                    <p class="text-sm text-slate-500">Ringkasan kondisi dan pergerakan alat proyek secara real-time.</p>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">Dashboard Inventaris</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">Ringkasan kondisi dan pergerakan alat proyek secara real-time.</p>
                 </div>
 
                 <!-- Panel Cards -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div onclick="openDetailModal('total_alat')" class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 cursor-pointer hover:border-accent transition group">
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4">
+                    <div onclick="openDetailModal('total_alat')" class="bg-white p-3 sm:p-4 rounded-xl shadow-sm border border-slate-200 cursor-pointer hover:border-accent transition group">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Alat</p>
-                                <h3 id="cardTotalAlat" class="text-2xl font-bold text-slate-900 mt-1">0</h3>
+                                <p class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-slate-500">Total Alat</p>
+                                <h3 id="cardTotalAlat" class="text-lg sm:text-2xl font-bold text-slate-900 mt-0.5">0</h3>
                             </div>
-                            <div class="w-12 h-12 rounded-lg bg-blue-50 text-accent flex items-center justify-center text-xl group-hover:bg-accent group-hover:text-white transition">
+                            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-blue-50 text-accent flex items-center justify-center text-sm sm:text-base group-hover:bg-accent group-hover:text-white transition">
                                 <i class="fa-solid fa-toolbox"></i>
                             </div>
                         </div>
                     </div>
 
-                    <div onclick="openDetailModal('kondisi_baik')" class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 cursor-pointer hover:border-emerald-500 transition group">
+                    <div onclick="openDetailModal('kondisi_baik')" class="bg-white p-3 sm:p-4 rounded-xl shadow-sm border border-slate-200 cursor-pointer hover:border-emerald-500 transition group">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Kondisi Baik</p>
-                                <h3 id="cardKondisiBaik" class="text-2xl font-bold text-emerald-600 mt-1">0</h3>
+                                <p class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-slate-500">Kondisi Baik</p>
+                                <h3 id="cardKondisiBaik" class="text-lg sm:text-2xl font-bold text-emerald-600 mt-0.5">0</h3>
                             </div>
-                            <div class="w-12 h-12 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl group-hover:bg-emerald-600 group-hover:text-white transition">
+                            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm sm:text-base group-hover:bg-emerald-600 group-hover:text-white transition">
                                 <i class="fa-solid fa-circle-check"></i>
                             </div>
                         </div>
                     </div>
 
-                    <div onclick="openDetailModal('rusak_perbaikan')" class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 cursor-pointer hover:border-amber-500 transition group">
+                    <div onclick="openDetailModal('rusak_perbaikan')" class="bg-white p-3 sm:p-4 rounded-xl shadow-sm border border-slate-200 cursor-pointer hover:border-amber-500 transition group">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Rusak / Perbaikan</p>
-                                <h3 id="cardRusakPerbaikan" class="text-2xl font-bold text-amber-600 mt-1">0</h3>
+                                <p class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-slate-500">Rusak / Perbaikan</p>
+                                <h3 id="cardRusakPerbaikan" class="text-lg sm:text-2xl font-bold text-amber-600 mt-0.5">0</h3>
                             </div>
-                            <div class="w-12 h-12 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-xl group-hover:bg-amber-600 group-hover:text-white transition">
+                            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-sm sm:text-base group-hover:bg-amber-600 group-hover:text-white transition">
                                 <i class="fa-solid fa-triangle-exclamation"></i>
                             </div>
                         </div>
                     </div>
 
-                    <div onclick="openDetailModal('stok_alat')" class="bg-white p-5 rounded-xl shadow-sm border border-slate-200 cursor-pointer hover:border-indigo-500 transition group">
+                    <div onclick="openDetailModal('stok_alat')" class="bg-white p-3 sm:p-4 rounded-xl shadow-sm border border-slate-200 cursor-pointer hover:border-indigo-500 transition group">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Stok Tersedia</p>
-                                <h3 id="cardStokAlat" class="text-2xl font-bold text-indigo-600 mt-1">0</h3>
+                                <p class="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-slate-500">Stok Tersedia</p>
+                                <h3 id="cardStokAlat" class="text-lg sm:text-2xl font-bold text-indigo-600 mt-0.5">0</h3>
                             </div>
-                            <div class="w-12 h-12 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl group-hover:bg-indigo-600 group-hover:text-white transition">
+                            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center text-sm sm:text-base group-hover:bg-indigo-600 group-hover:text-white transition">
                                 <i class="fa-solid fa-boxes-stacked"></i>
                             </div>
                         </div>
@@ -154,36 +159,36 @@
                 </div>
 
                 <!-- Charts Section -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-                        <h3 class="font-bold text-slate-800 mb-4 text-sm uppercase tracking-wider">Grafik Kondisi Alat</h3>
-                        <div class="relative h-64"><canvas id="chartKondisi"></canvas></div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                        <h3 class="font-bold text-slate-800 mb-3 text-xs sm:text-sm uppercase tracking-wider">Grafik Kondisi Alat</h3>
+                        <div class="relative h-48 sm:h-64"><canvas id="chartKondisi"></canvas></div>
                     </div>
-                    <div class="bg-white p-5 rounded-xl shadow-sm border border-slate-200">
-                        <h3 class="font-bold text-slate-800 mb-4 text-sm uppercase tracking-wider">Donut Stok Alat</h3>
-                        <div class="relative h-64 flex justify-center"><canvas id="chartStok"></canvas></div>
+                    <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                        <h3 class="font-bold text-slate-800 mb-3 text-xs sm:text-sm uppercase tracking-wider">Donut Stok Alat</h3>
+                        <div class="relative h-48 sm:h-64 flex justify-center"><canvas id="chartStok"></canvas></div>
                     </div>
                 </div>
 
                 <!-- Tabel Dashboard Memanjang -->
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div class="p-4 border-b border-slate-200">
-                        <h3 class="font-bold text-slate-800">Riwayat & Status Alat Terkini</h3>
+                    <div class="p-3 sm:p-4 border-b border-slate-200">
+                        <h3 class="font-bold text-slate-800 text-sm sm:text-base">Riwayat & Status Alat Terkini</h3>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm text-slate-600">
-                            <thead class="bg-slate-50 text-slate-700 uppercase text-xs border-b border-slate-200">
+                        <table class="w-full text-left text-xs sm:text-sm text-slate-600">
+                            <thead class="bg-slate-50 text-slate-700 uppercase text-[10px] sm:text-xs border-b border-slate-200">
                                 <tr>
-                                    <th class="px-4 py-3">No</th>
-                                    <th class="px-4 py-3">Tgl Pinjam</th>
-                                    <th class="px-4 py-3">Nama Peminjam</th>
-                                    <th class="px-4 py-3">No Inventaris</th>
-                                    <th class="px-4 py-3">Kategori</th>
-                                    <th class="px-4 py-3">Nama Equipment / Tool</th>
-                                    <th class="px-4 py-3">Brand / Type</th>
-                                    <th class="px-4 py-3">Qty</th>
-                                    <th class="px-4 py-3">Sat</th>
-                                    <th class="px-4 py-3">Keterangan</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">No</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Tgl Pinjam</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Nama Peminjam</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">No Inventaris</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Kategori</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Nama Equipment / Tool</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Brand / Type</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Qty</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Sat</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Keterangan</th>
                                 </tr>
                             </thead>
                             <tbody id="tableDashboardBody" class="divide-y divide-slate-200"></tbody>
@@ -193,31 +198,31 @@
             </section>
 
             <!-- FITUR 2: ALAT INVENTARIS -->
-            <section id="tab-inventaris" class="tab-content space-y-6 hidden">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <section id="tab-inventaris" class="tab-content space-y-4 sm:space-y-6 hidden">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
-                        <h2 class="text-2xl font-bold text-slate-900">Alat Inventaris</h2>
-                        <p class="text-sm text-slate-500">Kelola master data seluruh alat dan equipment proyek.</p>
+                        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">Alat Inventaris</h2>
+                        <p class="text-xs sm:text-sm text-slate-500">Kelola master data seluruh alat dan equipment proyek.</p>
                     </div>
-                    <button onclick="openInventarisModal()" class="bg-accent hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition flex items-center justify-center space-x-2">
+                    <button onclick="openInventarisModal()" class="bg-accent hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-xs sm:text-sm font-medium shadow-sm transition flex items-center justify-center space-x-2">
                         <i class="fa-solid fa-plus"></i><span>Tambah Alat Inventaris</span>
                     </button>
                 </div>
 
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm text-slate-600">
-                            <thead class="bg-slate-50 text-slate-700 uppercase text-xs border-b border-slate-200">
+                        <table class="w-full text-left text-xs sm:text-sm text-slate-600">
+                            <thead class="bg-slate-50 text-slate-700 uppercase text-[10px] sm:text-xs border-b border-slate-200">
                                 <tr>
-                                    <th class="px-4 py-3">No</th>
-                                    <th class="px-4 py-3">Tgl Pembelian</th>
-                                    <th class="px-4 py-3">No Inventaris</th>
-                                    <th class="px-4 py-3">Kategori</th>
-                                    <th class="px-4 py-3">Nama Equipment / Tool</th>
-                                    <th class="px-4 py-3">Brand / Type</th>
-                                    <th class="px-4 py-3">Qty</th>
-                                    <th class="px-4 py-3">Sat</th>
-                                    <th class="px-4 py-3 text-center">Aksi</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">No</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Tgl Pembelian</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">No Inventaris</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Kategori</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Nama Equipment / Tool</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Brand / Type</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Qty</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Sat</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3 text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="tableInventarisBody" class="divide-y divide-slate-200"></tbody>
@@ -227,36 +232,36 @@
             </section>
 
             <!-- FITUR 3: PEMINJAMAN & PENGEMBALIAN -->
-            <section id="tab-peminjaman" class="tab-content space-y-6 hidden">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <section id="tab-peminjaman" class="tab-content space-y-4 sm:space-y-6 hidden">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                     <div>
-                        <h2 class="text-2xl font-bold text-slate-900">Peminjaman & Pengembalian</h2>
-                        <p class="text-sm text-slate-500">Monitor sirkulasi peminjaman, pengembalian bertahap, dan perbaikan alat.</p>
+                        <h2 class="text-xl sm:text-2xl font-bold text-slate-900">Peminjaman & Pengembalian</h2>
+                        <p class="text-xs sm:text-sm text-slate-500">Monitor sirkulasi peminjaman, pengembalian bertahap, dan perbaikan alat.</p>
                     </div>
-                    <button onclick="openPinjamModal()" class="bg-accent hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-sm transition flex items-center justify-center space-x-2">
+                    <button onclick="openPinjamModal()" class="bg-accent hover:bg-blue-600 text-white px-3 py-2 rounded-lg text-xs sm:text-sm font-medium shadow-sm transition flex items-center justify-center space-x-2">
                         <i class="fa-solid fa-hand-holding"></i><span>Form Peminjaman</span>
                     </button>
                 </div>
 
                 <!-- Tabel Peminjaman -->
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div class="p-4 border-b border-slate-200 bg-slate-50">
-                        <h3 class="font-bold text-slate-800">Daftar Peminjaman Aktif</h3>
+                    <div class="p-3 sm:p-4 border-b border-slate-200 bg-slate-50">
+                        <h3 class="font-bold text-slate-800 text-xs sm:text-sm">Daftar Peminjaman Aktif</h3>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm text-slate-600">
-                            <thead class="bg-slate-50 text-slate-700 uppercase text-xs border-b border-slate-200">
+                        <table class="w-full text-left text-xs sm:text-sm text-slate-600">
+                            <thead class="bg-slate-50 text-slate-700 uppercase text-[10px] sm:text-xs border-b border-slate-200">
                                 <tr>
-                                    <th class="px-4 py-3">No</th>
-                                    <th class="px-4 py-3">Tgl Pinjam</th>
-                                    <th class="px-4 py-3">Nama Peminjam</th>
-                                    <th class="px-4 py-3">No Inventaris</th>
-                                    <th class="px-4 py-3">Nama Equipment / Tool</th>
-                                    <th class="px-4 py-3">Brand / Type</th>
-                                    <th class="px-4 py-3">Qty</th>
-                                    <th class="px-4 py-3">Sat</th>
-                                    <th class="px-4 py-3">Lokasi Kerja</th>
-                                    <th class="px-4 py-3 text-center">Aksi</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">No</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Tgl Pinjam</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Nama Peminjam</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">No Inventaris</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Nama Equipment / Tool</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Brand / Type</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Qty</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Sat</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Lokasi Kerja</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3 text-center">Aksi</th>
                                 </tr>
                             </thead>
                             <tbody id="tablePeminjamanBody" class="divide-y divide-slate-200"></tbody>
@@ -266,26 +271,26 @@
 
                 <!-- Tabel Pengembalian -->
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                    <div class="p-4 border-b border-slate-200 bg-slate-50">
-                        <h3 class="font-bold text-slate-800">Daftar Pengembalian & Riwayat Bertahap</h3>
+                    <div class="p-3 sm:p-4 border-b border-slate-200 bg-slate-50">
+                        <h3 class="font-bold text-slate-800 text-xs sm:text-sm">Daftar Pengembalian & Riwayat Bertahap</h3>
                     </div>
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm text-slate-600">
-                            <thead class="bg-slate-50 text-slate-700 uppercase text-xs border-b border-slate-200">
+                        <table class="w-full text-left text-xs sm:text-sm text-slate-600">
+                            <thead class="bg-slate-50 text-slate-700 uppercase text-[10px] sm:text-xs border-b border-slate-200">
                                 <tr>
-                                    <th class="px-4 py-3">No</th>
-                                    <th class="px-4 py-3">Tgl Pinjam</th>
-                                    <th class="px-4 py-3">Nama Peminjam</th>
-                                    <th class="px-4 py-3">No Inventaris</th>
-                                    <th class="px-4 py-3">Nama Equipment / Tool</th>
-                                    <th class="px-4 py-3">Brand / Type</th>
-                                    <th class="px-4 py-3">Qty Pinjam</th>
-                                    <th class="px-4 py-3">Sat</th>
-                                    <th class="px-4 py-3">Lokasi Kerja</th>
-                                    <th class="px-4 py-3">Tgl Kembali</th>
-                                    <th class="px-4 py-3">Qty Kembali</th>
-                                    <th class="px-4 py-3">Kondisi Kembali</th>
-                                    <th class="px-4 py-3 text-center">Aksi / Perbaikan</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">No</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Tgl Pinjam</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Nama Peminjam</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">No Inventaris</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Nama Equipment / Tool</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Brand / Type</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Qty Pinjam</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Sat</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Lokasi Kerja</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Tgl Kembali</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Qty Kembali</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Kondisi Kembali</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3 text-center">Aksi / Perbaikan</th>
                                 </tr>
                             </thead>
                             <tbody id="tablePengembalianBody" class="divide-y divide-slate-200"></tbody>
@@ -295,28 +300,28 @@
             </section>
 
             <!-- FITUR 4: STOK ALAT -->
-            <section id="tab-stok" class="tab-content space-y-6 hidden">
+            <section id="tab-stok" class="tab-content space-y-4 sm:space-y-6 hidden">
                 <div>
-                    <h2 class="text-2xl font-bold text-slate-900">Stok Alat & Rekonsiliasi</h2>
-                    <p class="text-sm text-slate-500">Perhitungan otomatis total, peminjaman, perbaikan, rusak, dan ketersediaan gudang.</p>
+                    <h2 class="text-xl sm:text-2xl font-bold text-slate-900">Stok Alat & Rekonsiliasi</h2>
+                    <p class="text-xs sm:text-sm text-slate-500">Perhitungan otomatis total, peminjaman, perbaikan, rusak, dan ketersediaan gudang.</p>
                 </div>
 
                 <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left text-sm text-slate-600">
-                            <thead class="bg-slate-50 text-slate-700 uppercase text-xs border-b border-slate-200">
+                        <table class="w-full text-left text-xs sm:text-sm text-slate-600">
+                            <thead class="bg-slate-50 text-slate-700 uppercase text-[10px] sm:text-xs border-b border-slate-200">
                                 <tr>
-                                    <th class="px-4 py-3">No</th>
-                                    <th class="px-4 py-3">Tgl Update</th>
-                                    <th class="px-4 py-3">Kategori</th>
-                                    <th class="px-4 py-3">No Inventaris</th>
-                                    <th class="px-4 py-3">Nama Equipment / Tool</th>
-                                    <th class="px-4 py-3">Brand / Type</th>
-                                    <th class="px-4 py-3">Total Alat</th>
-                                    <th class="px-4 py-3">Dipinjam</th>
-                                    <th class="px-4 py-3">Perbaikan</th>
-                                    <th class="px-4 py-3">Rusak</th>
-                                    <th class="px-4 py-3">Alat Tersedia</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">No</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Tgl Update</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Kategori</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">No Inventaris</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Nama Equipment / Tool</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Brand / Type</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Total Alat</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Dipinjam</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Perbaikan</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Rusak</th>
+                                    <th class="px-3 py-2.5 sm:px-4 sm:py-3">Alat Tersedia</th>
                                 </tr>
                             </thead>
                             <tbody id="tableStokBody" class="divide-y divide-slate-200"></tbody>
@@ -328,21 +333,21 @@
     </div>
 
     <!-- MODAL-MODAL -->
-    <div id="modalInventaris" class="fixed inset-0 z-50 bg-black/50 hidden flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-white rounded-xl shadow-xl max-w-4xl w-full p-6 space-y-4 my-8">
+    <div id="modalInventaris" class="fixed inset-0 z-50 bg-black/50 hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div class="bg-white rounded-xl shadow-xl max-w-4xl w-full p-4 sm:p-6 space-y-4 my-auto">
             <div class="flex justify-between items-center border-b pb-3">
-                <h3 class="text-lg font-bold text-slate-900">Form Tambah Alat Inventaris</h3>
+                <h3 class="text-base sm:text-lg font-bold text-slate-900">Form Tambah Alat Inventaris</h3>
                 <button onclick="closeInventarisModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <form id="formInventaris" onsubmit="saveInventaris(event)" class="space-y-4">
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Tanggal Pembelian</label>
-                    <input type="date" id="invTglPembelian" required class="w-full border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-accent outline-none">
+                    <input type="date" id="invTglPembelian" required class="w-full border border-slate-300 rounded-lg p-2 text-xs sm:text-sm focus:ring-2 focus:ring-accent outline-none">
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm" id="invMultiTable">
+                    <table class="w-full text-left text-xs sm:text-sm" id="invMultiTable">
                         <thead>
-                            <tr class="bg-slate-50 text-xs text-slate-700 uppercase">
+                            <tr class="bg-slate-50 text-[10px] sm:text-xs text-slate-700 uppercase">
                                 <th class="p-2">No Inventaris</th>
                                 <th class="p-2">Kategori</th>
                                 <th class="p-2">Nama Equipment / Tool</th>
@@ -357,34 +362,34 @@
                 </div>
                 <button type="button" onclick="addInventarisRow()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded transition"><i class="fa-solid fa-plus mr-1"></i>Tambah Baris Alat</button>
                 <div class="flex justify-end space-x-2 pt-4 border-t">
-                    <button type="button" onclick="closeInventarisModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium">Batal</button>
-                    <button type="submit" class="bg-accent hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium">Simpan Data</button>
+                    <button type="button" onclick="closeInventarisModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium">Batal</button>
+                    <button type="submit" class="bg-accent hover:bg-blue-600 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium">Simpan Data</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="modalPinjam" class="fixed inset-0 z-50 bg-black/50 hidden flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-white rounded-xl shadow-xl max-w-4xl w-full p-6 space-y-4 my-8">
+    <div id="modalPinjam" class="fixed inset-0 z-50 bg-black/50 hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div class="bg-white rounded-xl shadow-xl max-w-4xl w-full p-4 sm:p-6 space-y-4 my-auto">
             <div class="flex justify-between items-center border-b pb-3">
-                <h3 class="text-lg font-bold text-slate-900">Form Peminjaman Alat</h3>
+                <h3 class="text-base sm:text-lg font-bold text-slate-900">Form Peminjaman Alat</h3>
                 <button onclick="closePinjamModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <form id="formPinjam" onsubmit="savePinjaman(event)" class="space-y-4">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     <div>
                         <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Tanggal Pinjam</label>
-                        <input type="date" id="pinjamTgl" required class="w-full border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-accent outline-none">
+                        <input type="date" id="pinjamTgl" required class="w-full border border-slate-300 rounded-lg p-2 text-xs sm:text-sm focus:ring-2 focus:ring-accent outline-none">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Nama Peminjam</label>
-                        <input type="text" id="pinjamNama" required placeholder="Nama Lengkap Peminjam" class="w-full border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-accent outline-none">
+                        <input type="text" id="pinjamNama" required placeholder="Nama Lengkap Peminjam" class="w-full border border-slate-300 rounded-lg p-2 text-xs sm:text-sm focus:ring-2 focus:ring-accent outline-none">
                     </div>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm" id="pinjamMultiTable">
+                    <table class="w-full text-left text-xs sm:text-sm" id="pinjamMultiTable">
                         <thead>
-                            <tr class="bg-slate-50 text-xs text-slate-700 uppercase">
+                            <tr class="bg-slate-50 text-[10px] sm:text-xs text-slate-700 uppercase">
                                 <th class="p-2">No Inventaris (Pilih)</th>
                                 <th class="p-2">Equipment / Tool</th>
                                 <th class="p-2">Brand / Type</th>
@@ -399,86 +404,86 @@
                 </div>
                 <button type="button" onclick="addPinjamRow()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold px-3 py-1.5 rounded transition"><i class="fa-solid fa-plus mr-1"></i>Tambah Baris Peminjaman</button>
                 <div class="flex justify-end space-x-2 pt-4 border-t">
-                    <button type="button" onclick="closePinjamModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium">Batal</button>
-                    <button type="submit" class="bg-accent hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium">Simpan Peminjaman</button>
+                    <button type="button" onclick="closePinjamModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium">Batal</button>
+                    <button type="submit" class="bg-accent hover:bg-blue-600 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium">Simpan Peminjaman</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="modalPengembalian" class="fixed inset-0 z-50 bg-black/50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
+    <div id="modalPengembalian" class="fixed inset-0 z-50 bg-black/50 hidden flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-4 sm:p-6 space-y-4">
             <div class="flex justify-between items-center border-b pb-3">
-                <h3 class="text-lg font-bold text-slate-900">Form Pengembalian Alat</h3>
+                <h3 class="text-base sm:text-lg font-bold text-slate-900">Form Pengembalian Alat</h3>
                 <button onclick="closePengembalianModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <form id="formPengembalian" onsubmit="savePengembalian(event)" class="space-y-4">
                 <input type="hidden" id="kembaliPinjamId">
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Tanggal Kembali</label>
-                    <input type="date" id="kembaliTgl" required class="w-full border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-accent outline-none">
+                    <input type="date" id="kembaliTgl" required class="w-full border border-slate-300 rounded-lg p-2 text-xs sm:text-sm focus:ring-2 focus:ring-accent outline-none">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Qty Kembali</label>
-                    <input type="number" id="kembaliQty" min="1" required class="w-full border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-accent outline-none">
+                    <input type="number" id="kembaliQty" min="1" required class="w-full border border-slate-300 rounded-lg p-2 text-xs sm:text-sm focus:ring-2 focus:ring-accent outline-none">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Kondisi Kembali</label>
-                    <select id="kembaliKondisi" required class="w-full border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-accent outline-none">
+                    <select id="kembaliKondisi" required class="w-full border border-slate-300 rounded-lg p-2 text-xs sm:text-sm focus:ring-2 focus:ring-accent outline-none">
                         <option value="baik">Baik</option>
                         <option value="perbaikan">Perbaikan</option>
                         <option value="rusak">Rusak</option>
                     </select>
                 </div>
                 <div class="flex justify-end space-x-2 pt-4 border-t">
-                    <button type="button" onclick="closePengembalianModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium">Batal</button>
-                    <button type="submit" class="bg-accent hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium">Simpan Pengembalian</button>
+                    <button type="button" onclick="closePengembalianModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium">Batal</button>
+                    <button type="submit" class="bg-accent hover:bg-blue-600 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium">Simpan Pengembalian</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="modalPerbaikan" class="fixed inset-0 z-50 bg-black/50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 space-y-4">
+    <div id="modalPerbaikan" class="fixed inset-0 z-50 bg-black/50 hidden flex items-center justify-center p-3 sm:p-4">
+        <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-4 sm:p-6 space-y-4">
             <div class="flex justify-between items-center border-b pb-3">
-                <h3 class="text-lg font-bold text-slate-900">Update Status Perbaikan</h3>
+                <h3 class="text-base sm:text-lg font-bold text-slate-900">Update Status Perbaikan</h3>
                 <button onclick="closePerbaikanModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <form id="formPerbaikan" onsubmit="savePerbaikan(event)" class="space-y-4">
                 <input type="hidden" id="perbaikanIndex">
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Tanggal Update</label>
-                    <input type="date" id="perbaikanTgl" required class="w-full border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-accent outline-none">
+                    <input type="date" id="perbaikanTgl" required class="w-full border border-slate-300 rounded-lg p-2 text-xs sm:text-sm focus:ring-2 focus:ring-accent outline-none">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-600 mb-1">Kondisi Saat Ini / Hasil Perbaikan</label>
-                    <select id="perbaikanKondisi" required class="w-full border border-slate-300 rounded-lg p-2 text-sm focus:ring-2 focus:ring-accent outline-none">
+                    <select id="perbaikanKondisi" required class="w-full border border-slate-300 rounded-lg p-2 text-xs sm:text-sm focus:ring-2 focus:ring-accent outline-none">
                         <option value="selesai_perbaikan">Selesai di Perbaiki (Kembali Baik)</option>
                         <option value="rusak_total">Tidak Bisa di Perbaiki / Rusak Total</option>
                     </select>
                 </div>
                 <div class="flex justify-end space-x-2 pt-4 border-t">
-                    <button type="button" onclick="closePerbaikanModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium">Batal</button>
-                    <button type="submit" class="bg-accent hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium">Update Perbaikan</button>
+                    <button type="button" onclick="closePerbaikanModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium">Batal</button>
+                    <button type="submit" class="bg-accent hover:bg-blue-600 text-white px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium">Update Perbaikan</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="modalDetail" class="fixed inset-0 z-50 bg-black/50 hidden flex items-center justify-center p-4 overflow-y-auto">
-        <div class="bg-white rounded-xl shadow-xl max-w-5xl w-full p-6 space-y-4 my-8">
+    <div id="modalDetail" class="fixed inset-0 z-50 bg-black/50 hidden flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+        <div class="bg-white rounded-xl shadow-xl max-w-5xl w-full p-4 sm:p-6 space-y-4 my-auto">
             <div class="flex justify-between items-center border-b pb-3">
-                <h3 id="modalDetailTitle" class="text-lg font-bold text-slate-900">Rincian Data</h3>
+                <h3 id="modalDetailTitle" class="text-base sm:text-lg font-bold text-slate-900">Rincian Data</h3>
                 <button onclick="closeDetailModal()" class="text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="overflow-x-auto max-h-[60vh]">
-                <table class="w-full text-left text-sm text-slate-600">
-                    <thead id="modalDetailHead" class="bg-slate-50 text-slate-700 uppercase text-xs border-b border-slate-200"></thead>
+                <table class="w-full text-left text-xs sm:text-sm text-slate-600">
+                    <thead id="modalDetailHead" class="bg-slate-50 text-slate-700 uppercase text-[10px] sm:text-xs border-b border-slate-200"></thead>
                     <tbody id="modalDetailBody" class="divide-y divide-slate-200"></tbody>
                 </table>
             </div>
             <div class="flex justify-end pt-2 border-t">
-                <button onclick="closeDetailModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-4 py-2 rounded-lg text-sm font-medium">Tutup</button>
+                <button onclick="closeDetailModal()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-medium">Tutup</button>
             </div>
         </div>
     </div>
@@ -501,10 +506,8 @@
         try {
             const app = initializeApp(firebaseConfig);
             db = getFirestore(app);
-            document.getElementById('syncStatus').innerText = "Terhubung Cloud (Firestore)";
         } catch (e) {
-            document.getElementById('syncStatus').innerText = "Mode Offline (Local)";
-            document.getElementById('syncStatus').className = "text-xs bg-amber-600 text-white px-2 py-1 rounded";
+            console.warn("Offline mode");
         }
 
         window.appData = {
@@ -544,7 +547,7 @@
                         renderAll();
                     }
                 } catch (err) {
-                    console.warn("Gagal ambil dari Cloud Firestore, menggunakan data lokal:", err);
+                    console.warn("Gagal ambil dari Cloud Firestore:", err);
                 }
             }
         }
@@ -705,13 +708,13 @@
             const tbody = document.getElementById('invMultiBody');
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td class="p-2"><input type="text" required class="inv-no border rounded p-1.5 w-full text-sm" placeholder="No. Inv"></td>
-                <td class="p-2"><input type="text" required class="inv-cat border rounded p-1.5 w-full text-sm" placeholder="Kategori"></td>
-                <td class="p-2"><input type="text" required class="inv-nama border rounded p-1.5 w-full text-sm" placeholder="Nama Alat"></td>
-                <td class="p-2"><input type="text" required class="inv-brand border rounded p-1.5 w-full text-sm" placeholder="Brand/Type"></td>
-                <td class="p-2"><input type="number" min="1" value="1" required class="inv-qty border rounded p-1.5 w-20 text-sm"></td>
-                <td class="p-2"><input type="text" required class="inv-sat border rounded p-1.5 w-20 text-sm" placeholder="Unit"></td>
-                <td class="p-2 text-center"><button type="button" onclick="this.closest('tr').remove()" class="text-red-500 hover:text-red-700 px-2 py-1"><i class="fa-solid fa-trash"></i></button></td>
+                <td class="p-1.5 sm:p-2"><input type="text" required class="inv-no border rounded p-1 sm:p-1.5 w-full text-xs sm:text-sm" placeholder="No. Inv"></td>
+                <td class="p-1.5 sm:p-2"><input type="text" required class="inv-cat border rounded p-1 sm:p-1.5 w-full text-xs sm:text-sm" placeholder="Kategori"></td>
+                <td class="p-1.5 sm:p-2"><input type="text" required class="inv-nama border rounded p-1 sm:p-1.5 w-full text-xs sm:text-sm" placeholder="Nama Alat"></td>
+                <td class="p-1.5 sm:p-2"><input type="text" required class="inv-brand border rounded p-1 sm:p-1.5 w-full text-xs sm:text-sm" placeholder="Brand/Type"></td>
+                <td class="p-1.5 sm:p-2"><input type="number" min="1" value="1" required class="inv-qty border rounded p-1 sm:p-1.5 w-16 sm:w-20 text-xs sm:text-sm"></td>
+                <td class="p-1.5 sm:p-2"><input type="text" required class="inv-sat border rounded p-1 sm:p-1.5 w-16 sm:w-20 text-xs sm:text-sm" placeholder="Unit"></td>
+                <td class="p-1.5 sm:p-2 text-center"><button type="button" onclick="this.closest('tr').remove()" class="text-red-500 hover:text-red-700 px-1 py-0.5"><i class="fa-solid fa-trash"></i></button></td>
             `;
             tbody.appendChild(tr);
         }
@@ -744,15 +747,15 @@
             window.appData.inventaris.forEach((item, index) => {
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50">
-                        <td class="px-4 py-3">${index + 1}</td>
-                        <td class="px-4 py-3">${item.tglPembelian}</td>
-                        <td class="px-4 py-3 font-semibold text-slate-800">${item.noInventaris}</td>
-                        <td class="px-4 py-3">${item.kategori}</td>
-                        <td class="px-4 py-3">${item.nama}</td>
-                        <td class="px-4 py-3">${item.brand}</td>
-                        <td class="px-4 py-3">${item.qty}</td>
-                        <td class="px-4 py-3">${item.satuan}</td>
-                        <td class="px-4 py-3 text-center space-x-2">
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${index + 1}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${item.tglPembelian}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3 font-semibold text-slate-800">${item.noInventaris}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${item.kategori}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${item.nama}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${item.brand}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${item.qty}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${item.satuan}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3 text-center space-x-2">
                             <button onclick="editInventaris('${item.id}')" class="text-blue-500 hover:text-blue-700" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
                             <button onclick="deleteInventaris('${item.id}')" class="text-red-500 hover:text-red-700" title="Hapus"><i class="fa-solid fa-trash"></i></button>
                         </td>
@@ -803,13 +806,13 @@
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td class="p-2"><select required class="pinjam-inv border rounded p-1.5 w-full text-sm" onchange="onSelectInventaris(this)">${options}</select></td>
-                <td class="p-2"><input type="text" readonly class="pinjam-nama border bg-slate-100 rounded p-1.5 w-full text-sm" placeholder="Otomatis"></td>
-                <td class="p-2"><input type="text" readonly class="pinjam-brand border bg-slate-100 rounded p-1.5 w-full text-sm" placeholder="Otomatis"></td>
-                <td class="p-2"><input type="number" min="1" value="1" required class="pinjam-qty border rounded p-1.5 w-20 text-sm"></td>
-                <td class="p-2"><input type="text" readonly class="pinjam-sat border bg-slate-100 rounded p-1.5 w-16 text-sm" placeholder="Sat"></td>
-                <td class="p-2"><input type="text" required class="pinjam-lokasi border rounded p-1.5 w-full text-sm" placeholder="Lokasi Kerja"></td>
-                <td class="p-2 text-center"><button type="button" onclick="this.closest('tr').remove()" class="text-red-500 hover:text-red-700 px-2 py-1"><i class="fa-solid fa-trash"></i></button></td>
+                <td class="p-1.5 sm:p-2"><select required class="pinjam-inv border rounded p-1 sm:p-1.5 w-full text-xs sm:text-sm" onchange="onSelectInventaris(this)">${options}</select></td>
+                <td class="p-1.5 sm:p-2"><input type="text" readonly class="pinjam-nama border bg-slate-100 rounded p-1 sm:p-1.5 w-full text-xs sm:text-sm" placeholder="Otomatis"></td>
+                <td class="p-1.5 sm:p-2"><input type="text" readonly class="pinjam-brand border bg-slate-100 rounded p-1 sm:p-1.5 w-full text-xs sm:text-sm" placeholder="Otomatis"></td>
+                <td class="p-1.5 sm:p-2"><input type="number" min="1" value="1" required class="pinjam-qty border rounded p-1 sm:p-1.5 w-16 sm:w-20 text-xs sm:text-sm"></td>
+                <td class="p-1.5 sm:p-2"><input type="text" readonly class="pinjam-sat border bg-slate-100 rounded p-1 sm:p-1.5 w-14 sm:w-16 text-xs sm:text-sm" placeholder="Sat"></td>
+                <td class="p-1.5 sm:p-2"><input type="text" required class="pinjam-lokasi border rounded p-1 sm:p-1.5 w-full text-xs sm:text-sm" placeholder="Lokasi Kerja"></td>
+                <td class="p-1.5 sm:p-2 text-center"><button type="button" onclick="this.closest('tr').remove()" class="text-red-500 hover:text-red-700 px-1 py-0.5"><i class="fa-solid fa-trash"></i></button></td>
             `;
             tbody.appendChild(tr);
         }
@@ -863,17 +866,17 @@
             window.appData.peminjaman.forEach((item, index) => {
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50">
-                        <td class="px-4 py-3">${index + 1}</td>
-                        <td class="px-4 py-3">${item.tglPinjam}</td>
-                        <td class="px-4 py-3 font-semibold text-slate-800">${item.namaPeminjam}</td>
-                        <td class="px-4 py-3">${item.noInventaris}</td>
-                        <td class="px-4 py-3">${item.namaEquipment}</td>
-                        <td class="px-4 py-3">${item.brandType}</td>
-                        <td class="px-4 py-3">${item.qty}</td>
-                        <td class="px-4 py-3">${item.satuan}</td>
-                        <td class="px-4 py-3">${item.lokasiKerja}</td>
-                        <td class="px-4 py-3 text-center space-x-2">
-                            <button onclick="openPengembalianModalForItem('${item.id}')" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-700 px-2.5 py-1 rounded text-xs font-semibold"><i class="fa-solid fa-rotate-left mr-1"></i>Kembalikan</button>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${index + 1}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${item.tglPinjam}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3 font-semibold text-slate-800">${item.namaPeminjam}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${item.noInventaris}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${item.namaEquipment}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${item.brandType}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${item.qty}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${item.satuan}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${item.lokasiKerja}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3 text-center space-x-2">
+                            <button onclick="openPengembalianModalForItem('${item.id}')" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-700 px-2 py-1 rounded text-[10px] sm:text-xs font-semibold"><i class="fa-solid fa-rotate-left mr-1"></i>Kembalikan</button>
                             <button onclick="deletePeminjaman('${item.id}')" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
                         </td>
                     </tr>
@@ -937,28 +940,28 @@
                 if(item.kondisiKembali === 'perbaikan') badgeColor = 'bg-amber-100 text-amber-800';
                 if(item.kondisiKembali === 'rusak') badgeColor = 'bg-red-100 text-red-800';
 
-                let actionBtn = `<span class="text-xs text-slate-400">Selesai</span>`;
+                let actionBtn = `<span class="text-[10px] sm:text-xs text-slate-400">Selesai</span>`;
                 if(item.kondisiKembali === 'perbaikan' && item.statusPerbaikan === 'pending') {
-                    actionBtn = `<button onclick="openPerbaikanModal('${item.id}')" class="bg-amber-500 hover:bg-amber-600 text-white px-2 py-1 rounded text-xs font-semibold"><i class="fa-solid fa-wrench mr-1"></i>Perbaikan</button>`;
+                    actionBtn = `<button onclick="openPerbaikanModal('${item.id}')" class="bg-amber-500 hover:bg-amber-600 text-white px-2 py-1 rounded text-[10px] sm:text-xs font-semibold"><i class="fa-solid fa-wrench mr-1"></i>Perbaikan</button>`;
                 } else if(item.kondisiKembali === 'perbaikan' && item.statusPerbaikan !== 'pending') {
-                    actionBtn = `<span class="text-xs font-semibold text-blue-600">${item.statusPerbaikan === 'selesai_perbaikan' ? 'Selesai Diperbaiki' : 'Rusak Total'}</span>`;
+                    actionBtn = `<span class="text-[10px] sm:text-xs font-semibold text-blue-600">${item.statusPerbaikan === 'selesai_perbaikan' ? 'Selesai Diperbaiki' : 'Rusak Total'}</span>`;
                 }
 
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50">
-                        <td class="px-4 py-3">${index + 1}</td>
-                        <td class="px-4 py-3">${item.tglPinjam}</td>
-                        <td class="px-4 py-3 font-semibold">${item.namaPeminjam}</td>
-                        <td class="px-4 py-3">${item.noInventaris}</td>
-                        <td class="px-4 py-3">${item.namaEquipment}</td>
-                        <td class="px-4 py-3">${item.brandType}</td>
-                        <td class="px-4 py-3">${item.qtyPinjam}</td>
-                        <td class="px-4 py-3">${item.satuan}</td>
-                        <td class="px-4 py-3">${item.lokasiKerja}</td>
-                        <td class="px-4 py-3">${item.tglKembali}</td>
-                        <td class="px-4 py-3 font-bold">${item.qtyKembali}</td>
-                        <td class="px-4 py-3"><span class="px-2 py-1 rounded text-xs font-semibold uppercase ${badgeColor}">${item.kondisiKembali}</span></td>
-                        <td class="px-4 py-3 text-center space-x-2">
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${index + 1}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${item.tglPinjam}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3 font-semibold">${item.namaPeminjam}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${item.noInventaris}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${item.namaEquipment}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${item.brandType}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${item.qtyPinjam}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${item.satuan}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${item.lokasiKerja}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${item.tglKembali}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3 font-bold">${item.qtyKembali}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3"><span class="px-1.5 py-0.5 rounded text-[10px] sm:text-xs font-semibold uppercase ${badgeColor}">${item.kondisiKembali}</span></td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3 text-center space-x-2">
                             ${actionBtn}
                             <button onclick="deletePengembalian('${item.id}')" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
                         </td>
@@ -999,17 +1002,17 @@
             let map = {};
             window.appData.inventaris.forEach(inv => {
                 map[inv.noInventaris] = {
+                    tglUpdate: inv.tglPembelian,
                     kategori: inv.kategori,
                     noInventaris: inv.noInventaris,
                     nama: inv.nama,
                     brand: inv.brand,
-                    satuan: inv.satuan || 'Unit',
-                    tglUpdate: inv.tglPembelian,
                     totalAlat: inv.qty,
                     dipinjam: 0,
                     perbaikan: 0,
                     rusak: 0,
-                    tersedia: inv.qty
+                    tersedia: inv.qty,
+                    satuan: inv.satuan || 'Unit'
                 };
             });
 
@@ -1054,23 +1057,22 @@
             stokData.forEach((item, index) => {
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50">
-                        <td class="px-4 py-3">${index + 1}</td>
-                        <td class="px-4 py-3">${item.tglUpdate}</td>
-                        <td class="px-4 py-3">${item.kategori}</td>
-                        <td class="px-4 py-3 font-semibold">${item.noInventaris}</td>
-                        <td class="px-4 py-3">${item.nama}</td>
-                        <td class="px-4 py-3">${item.brand}</td>
-                        <td class="px-4 py-3 font-bold">${item.totalAlat}</td>
-                        <td class="px-4 py-3 text-blue-600">${item.dipinjam}</td>
-                        <td class="px-4 py-3 text-amber-600">${item.perbaikan}</td>
-                        <td class="px-4 py-3 text-red-600">${item.rusak}</td>
-                        <td class="px-4 py-3 font-bold text-emerald-600">${item.tersedia}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${index + 1}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${item.tglUpdate}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${item.kategori}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3 font-semibold">${item.noInventaris}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${item.nama}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${item.brand}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3 font-bold">${item.totalAlat}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3 text-blue-600">${item.dipinjam}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3 text-amber-600">${item.perbaikan}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3 text-red-600">${item.rusak}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3 font-bold text-emerald-600">${item.tersedia}</td>
                     </tr>
                 `;
             });
         }
 
-        // Helper untuk mendapatkan Kategori dari Master Inventaris berdasarkan No Inventaris
         function getKategoriByNoInv(noInv) {
             const match = window.appData.inventaris.find(i => i.noInventaris === noInv);
             return match ? match.kategori : '-';
@@ -1101,56 +1103,54 @@
             const tbody = document.getElementById('tableDashboardBody');
             tbody.innerHTML = '';
             
-            // Riwayat Peminjaman Aktif
             window.appData.peminjaman.forEach((p, idx) => {
                 const kat = getKategoriByNoInv(p.noInventaris);
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50">
-                        <td class="px-4 py-3">${idx + 1}</td>
-                        <td class="px-4 py-3">${p.tglPinjam}</td>
-                        <td class="px-4 py-3 font-semibold">${p.namaPeminjam}</td>
-                        <td class="px-4 py-3">${p.noInventaris}</td>
-                        <td class="px-4 py-3">${kat}</td>
-                        <td class="px-4 py-3">${p.namaEquipment}</td>
-                        <td class="px-4 py-3">${p.brandType}</td>
-                        <td class="px-4 py-3">${p.qty}</td>
-                        <td class="px-4 py-3">${p.satuan || 'Unit'}</td>
-                        <td class="px-4 py-3"><span class="bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs font-semibold">Dipinjam</span></td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${idx + 1}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${p.tglPinjam}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3 font-semibold">${p.namaPeminjam}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${p.noInventaris}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${kat}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${p.namaEquipment}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${p.brandType}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${p.qty}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${p.satuan || 'Unit'}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3"><span class="bg-blue-100 text-blue-800 px-1.5 py-0.5 rounded text-[10px] sm:text-xs font-semibold">Dipinjam</span></td>
                     </tr>
                 `;
             });
 
-            // Riwayat Pengembalian & Status Update Perbaikan Dinamis
             window.appData.pengembalian.forEach((k, idx) => {
                 const kat = getKategoriByNoInv(k.noInventaris);
                 let badgeKeterangan = '';
 
                 if (k.kondisiKembali === 'perbaikan') {
                     if (k.statusPerbaikan === 'pending') {
-                        badgeKeterangan = `<span class="bg-amber-100 text-amber-800 px-2 py-1 rounded text-xs font-semibold">Dikembalikan (perbaikan)</span>`;
+                        badgeKeterangan = `<span class="bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded text-[10px] sm:text-xs font-semibold">Dikembalikan (perbaikan)</span>`;
                     } else if (k.statusPerbaikan === 'selesai_perbaikan') {
-                        badgeKeterangan = `<span class="bg-emerald-100 text-emerald-800 px-2 py-1 rounded text-xs font-semibold">Selesai Diperbaiki (Kembali Baik)</span>`;
+                        badgeKeterangan = `<span class="bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded text-[10px] sm:text-xs font-semibold">Selesai Diperbaiki (Kembali Baik)</span>`;
                     } else if (k.statusPerbaikan === 'rusak_total') {
-                        badgeKeterangan = `<span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-semibold">Rusak Total</span>`;
+                        badgeKeterangan = `<span class="bg-red-100 text-red-800 px-1.5 py-0.5 rounded text-[10px] sm:text-xs font-semibold">Rusak Total</span>`;
                     }
                 } else if (k.kondisiKembali === 'rusak') {
-                    badgeKeterangan = `<span class="bg-red-100 text-red-800 px-2 py-1 rounded text-xs font-semibold">Dikembalikan (rusak)</span>`;
+                    badgeKeterangan = `<span class="bg-red-100 text-red-800 px-1.5 py-0.5 rounded text-[10px] sm:text-xs font-semibold">Dikembalikan (rusak)</span>`;
                 } else {
-                    badgeKeterangan = `<span class="bg-emerald-100 text-emerald-800 px-2 py-1 rounded text-xs font-semibold">Dikembalikan (${k.kondisiKembali})</span>`;
+                    badgeKeterangan = `<span class="bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded text-[10px] sm:text-xs font-semibold">Dikembalikan (${k.kondisiKembali})</span>`;
                 }
 
                 tbody.innerHTML += `
                     <tr class="hover:bg-slate-50">
-                        <td class="px-4 py-3">${window.appData.peminjaman.length + idx + 1}</td>
-                        <td class="px-4 py-3">${k.tglPinjam}</td>
-                        <td class="px-4 py-3 font-semibold">${k.namaPeminjam}</td>
-                        <td class="px-4 py-3">${k.noInventaris}</td>
-                        <td class="px-4 py-3">${kat}</td>
-                        <td class="px-4 py-3">${k.namaEquipment}</td>
-                        <td class="px-4 py-3">${k.brandType}</td>
-                        <td class="px-4 py-3">${k.qtyKembali}</td>
-                        <td class="px-4 py-3">${k.satuan || 'Unit'}</td>
-                        <td class="px-4 py-3">${badgeKeterangan}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${window.appData.peminjaman.length + idx + 1}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${k.tglPinjam}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3 font-semibold">${k.namaPeminjam}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${k.noInventaris}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${kat}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${k.namaEquipment}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${k.brandType}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${k.qtyKembali}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${k.satuan || 'Unit'}</td>
+                        <td class="px-3 py-2.5 sm:px-4 sm:py-3">${badgeKeterangan}</td>
                     </tr>
                 `;
             });
@@ -1165,35 +1165,35 @@
 
             if(type === 'total_alat') {
                 title.innerText = "Rincian Total Alat Inventaris";
-                head.innerHTML = `<tr><th class="p-3">No</th><th class="p-3">No Inv</th><th class="p-3">Nama Alat</th><th class="p-3">Brand</th><th class="p-3">Qty</th><th class="p-3">Satuan</th></tr>`;
+                head.innerHTML = `<tr><th class="p-2 sm:p-3">No</th><th class="p-2 sm:p-3">No Inv</th><th class="p-2 sm:p-3">Nama Alat</th><th class="p-2 sm:p-3">Brand</th><th class="p-2 sm:p-3">Qty</th><th class="p-2 sm:p-3">Satuan</th></tr>`;
                 window.appData.inventaris.forEach((i, idx) => {
-                    body.innerHTML += `<tr><td class="p-3">${idx+1}</td><td class="p-3">${i.noInventaris}</td><td class="p-3">${i.nama}</td><td class="p-3">${i.brand}</td><td class="p-3 font-bold">${i.qty}</td><td class="p-3">${i.satuan || 'Unit'}</td></tr>`;
+                    body.innerHTML += `<tr><td class="p-2 sm:p-3">${idx+1}</td><td class="p-2 sm:p-3">${i.noInventaris}</td><td class="p-2 sm:p-3">${i.nama}</td><td class="p-2 sm:p-3">${i.brand}</td><td class="p-2 sm:p-3 font-bold">${i.qty}</td><td class="p-2 sm:p-3">${i.satuan || 'Unit'}</td></tr>`;
                 });
             } else if(type === 'kondisi_baik') {
                 title.innerText = "Rincian Alat Kondisi Baik";
-                head.innerHTML = `<tr><th class="p-3">No</th><th class="p-3">No Inv</th><th class="p-3">Nama Alat</th><th class="p-3">Brand</th><th class="p-3">Qty Baik</th></tr>`;
+                head.innerHTML = `<tr><th class="p-2 sm:p-3">No</th><th class="p-2 sm:p-3">No Inv</th><th class="p-2 sm:p-3">Nama Alat</th><th class="p-2 sm:p-3">Brand</th><th class="p-2 sm:p-3">Qty Baik</th></tr>`;
                 const stok = calculateStokSummary();
                 stok.forEach((s, idx) => {
                     let qtyBaik = s.totalAlat - s.perbaikan - s.rusak;
                     if(qtyBaik > 0) {
-                        body.innerHTML += `<tr><td class="p-3">${idx+1}</td><td class="p-3">${s.noInventaris}</td><td class="p-3">${s.nama}</td><td class="p-3">${s.brand}</td><td class="p-3 font-bold text-emerald-600">${qtyBaik}</td></tr>`;
+                        body.innerHTML += `<tr><td class="p-2 sm:p-3">${idx+1}</td><td class="p-2 sm:p-3">${s.noInventaris}</td><td class="p-2 sm:p-3">${s.nama}</td><td class="p-2 sm:p-3">${s.brand}</td><td class="p-2 sm:p-3 font-bold text-emerald-600">${qtyBaik}</td></tr>`;
                     }
                 });
             } else if(type === 'rusak_perbaikan') {
                 title.innerText = "Rincian Alat Rusak / Perbaikan";
-                head.innerHTML = `<tr><th class="p-3">No</th><th class="p-3">No Inv</th><th class="p-3">Nama Alat</th><th class="p-3">Perbaikan</th><th class="p-3">Rusak</th></tr>`;
+                head.innerHTML = `<tr><th class="p-2 sm:p-3">No</th><th class="p-2 sm:p-3">No Inv</th><th class="p-2 sm:p-3">Nama Alat</th><th class="p-2 sm:p-3">Perbaikan</th><th class="p-2 sm:p-3">Rusak</th></tr>`;
                 const stok = calculateStokSummary();
                 stok.forEach((s, idx) => {
                     if(s.perbaikan > 0 || s.rusak > 0) {
-                        body.innerHTML += `<tr><td class="p-3">${idx+1}</td><td class="p-3">${s.noInventaris}</td><td class="p-3">${s.nama}</td><td class="p-3 text-amber-600 font-bold">${s.perbaikan}</td><td class="p-3 text-red-600 font-bold">${s.rusak}</td></tr>`;
+                        body.innerHTML += `<tr><td class="p-2 sm:p-3">${idx+1}</td><td class="p-2 sm:p-3">${s.noInventaris}</td><td class="p-2 sm:p-3">${s.nama}</td><td class="p-2 sm:p-3 text-amber-600 font-bold">${s.perbaikan}</td><td class="p-2 sm:p-3 text-red-600 font-bold">${s.rusak}</td></tr>`;
                     }
                 });
             } else if(type === 'stok_alat') {
                 title.innerText = "Rincian Stok Alat Tersedia di Gudang";
-                head.innerHTML = `<tr><th class="p-3">No</th><th class="p-3">No Inv</th><th class="p-3">Nama Alat</th><th class="p-3">Tersedia</th><th class="p-3">Satuan</th></tr>`;
+                head.innerHTML = `<tr><th class="p-2 sm:p-3">No</th><th class="p-2 sm:p-3">No Inv</th><th class="p-2 sm:p-3">Nama Alat</th><th class="p-2 sm:p-3">Tersedia</th><th class="p-2 sm:p-3">Satuan</th></tr>`;
                 const stok = calculateStokSummary();
                 stok.forEach((s, idx) => {
-                    body.innerHTML += `<tr><td class="p-3">${idx+1}</td><td class="p-3">${s.noInventaris}</td><td class="p-3">${s.nama}</td><td class="p-3 font-bold text-indigo-600">${s.tersedia}</td><td class="p-3">${s.satuan}</td></tr>`;
+                    body.innerHTML += `<tr><td class="p-2 sm:p-3">${idx+1}</td><td class="p-2 sm:p-3">${s.noInventaris}</td><td class="p-2 sm:p-3">${s.nama}</td><td class="p-2 sm:p-3 font-bold text-indigo-600">${s.tersedia}</td><td class="p-2 sm:p-3">${s.satuan}</td></tr>`;
                 });
             }
 
@@ -1254,20 +1254,73 @@
             });
         }
 
-        // --- EXPORT / IMPORT EXCEL & JSON ---
+        // --- EXPORT / IMPORT EXCEL & JSON (Urutan Kolom Sesuai Tabel) ---
         window.exportToExcel = function() {
             const wb = XLSX.utils.book_new();
             
-            const wsInventaris = XLSX.utils.json_to_sheet(window.appData.inventaris);
+            // 1. Inventaris Alat (Urutan: tglPembelian, noInventaris, kategori, nama, brand, qty, satuan)
+            const mappedInventaris = window.appData.inventaris.map((item, idx) => ({
+                "No": idx + 1,
+                "Tgl Pembelian": item.tglPembelian,
+                "No Inventaris": item.noInventaris,
+                "Kategori": item.kategori,
+                "Nama Equipment / Tool": item.nama,
+                "Brand / Type": item.brand,
+                "Qty": item.qty,
+                "Sat": item.satuan
+            }));
+            const wsInventaris = XLSX.utils.json_to_sheet(mappedInventaris);
             XLSX.utils.book_append_sheet(wb, wsInventaris, "Inventaris Alat");
 
-            const wsPeminjaman = XLSX.utils.json_to_sheet(window.appData.peminjaman);
+            // 2. Peminjaman (Urutan: tglPinjam, namaPeminjam, noInventaris, namaEquipment, brandType, qty, satuan, lokasiKerja)
+            const mappedPeminjaman = window.appData.peminjaman.map((item, idx) => ({
+                "No": idx + 1,
+                "Tgl Pinjam": item.tglPinjam,
+                "Nama Peminjam": item.namaPeminjam,
+                "No Inventaris": item.noInventaris,
+                "Nama Equipment / Tool": item.namaEquipment,
+                "Brand / Type": item.brandType,
+                "Qty": item.qty,
+                "Sat": item.satuan,
+                "Lokasi Kerja": item.lokasiKerja
+            }));
+            const wsPeminjaman = XLSX.utils.json_to_sheet(mappedPeminjaman);
             XLSX.utils.book_append_sheet(wb, wsPeminjaman, "Peminjaman");
 
-            const wsPengembalian = XLSX.utils.json_to_sheet(window.appData.pengembalian);
+            // 3. Pengembalian (Urutan: tglPinjam, namaPeminjam, noInventaris, namaEquipment, brandType, qtyPinjam, satuan, lokasiKerja, tglKembali, qtyKembali, kondisiKembali)
+            const mappedPengembalian = window.appData.pengembalian.map((item, idx) => ({
+                "No": idx + 1,
+                "Tgl Pinjam": item.tglPinjam,
+                "Nama Peminjam": item.namaPeminjam,
+                "No Inventaris": item.noInventaris,
+                "Nama Equipment / Tool": item.namaEquipment,
+                "Brand / Type": item.brandType,
+                "Qty Pinjam": item.qtyPinjam,
+                "Sat": item.satuan,
+                "Lokasi Kerja": item.lokasiKerja,
+                "Tgl Kembali": item.tglKembali,
+                "Qty Kembali": item.qtyKembali,
+                "Kondisi Kembali": item.kondisiKembali
+            }));
+            const wsPengembalian = XLSX.utils.json_to_sheet(mappedPengembalian);
             XLSX.utils.book_append_sheet(wb, wsPengembalian, "Pengembalian");
 
-            const wsStok = XLSX.utils.json_to_sheet(calculateStokSummary());
+            // 4. Stok Alat (Urutan: tglUpdate, kategori, noInventaris, nama, brand, totalAlat, dipinjam, perbaikan, rusak, tersedia)
+            const rawStok = calculateStokSummary();
+            const mappedStok = rawStok.map((item, idx) => ({
+                "No": idx + 1,
+                "Tgl Update": item.tglUpdate,
+                "Kategori": item.kategori,
+                "No Inventaris": item.noInventaris,
+                "Nama Equipment / Tool": item.nama,
+                "Brand / Type": item.brand,
+                "Total Alat": item.totalAlat,
+                "Dipinjam": item.dipinjam,
+                "Perbaikan": item.perbaikan,
+                "Rusak": item.rusak,
+                "Alat Tersedia": item.tersedia
+            }));
+            const wsStok = XLSX.utils.json_to_sheet(mappedStok);
             XLSX.utils.book_append_sheet(wb, wsStok, "Stok Alat");
 
             XLSX.writeFile(wb, "Data_Inventaris_ArkPro.xlsx");
@@ -1282,13 +1335,49 @@
                 const workbook = XLSX.read(data, {type: 'array'});
                 
                 if(workbook.SheetNames.includes("Inventaris Alat")) {
-                    window.appData.inventaris = XLSX.utils.sheet_to_json(workbook.Sheets["Inventaris Alat"]);
+                    const jsonArr = XLSX.utils.sheet_to_json(workbook.Sheets["Inventaris Alat"]);
+                    window.appData.inventaris = jsonArr.map(x => ({
+                        id: 'INV_' + Date.now() + Math.random().toString(36).substr(2, 5),
+                        tglPembelian: x["Tgl Pembelian"] || new Date().toISOString().split('T')[0],
+                        noInventaris: x["No Inventaris"] || '',
+                        kategori: x["Kategori"] || '',
+                        nama: x["Nama Equipment / Tool"] || '',
+                        brand: x["Brand / Type"] || '',
+                        qty: parseInt(x["Qty"]) || 1,
+                        satuan: x["Sat"] || 'Unit'
+                    }));
                 }
                 if(workbook.SheetNames.includes("Peminjaman")) {
-                    window.appData.peminjaman = XLSX.utils.sheet_to_json(workbook.Sheets["Peminjaman"]);
+                    const jsonArr = XLSX.utils.sheet_to_json(workbook.Sheets["Peminjaman"]);
+                    window.appData.peminjaman = jsonArr.map(x => ({
+                        id: 'PJM_' + Date.now() + Math.random().toString(36).substr(2, 5),
+                        tglPinjam: x["Tgl Pinjam"] || '',
+                        namaPeminjam: x["Nama Peminjam"] || '',
+                        noInventaris: x["No Inventaris"] || '',
+                        namaEquipment: x["Nama Equipment / Tool"] || '',
+                        brandType: x["Brand / Type"] || '',
+                        qty: parseInt(x["Qty"]) || 1,
+                        satuan: x["Sat"] || 'Unit',
+                        lokasiKerja: x["Lokasi Kerja"] || ''
+                    }));
                 }
                 if(workbook.SheetNames.includes("Pengembalian")) {
-                    window.appData.pengembalian = XLSX.utils.sheet_to_json(workbook.Sheets["Pengembalian"]);
+                    const jsonArr = XLSX.utils.sheet_to_json(workbook.Sheets["Pengembalian"]);
+                    window.appData.pengembalian = jsonArr.map(x => ({
+                        id: 'KEM_' + Date.now() + Math.random().toString(36).substr(2, 5),
+                        tglPinjam: x["Tgl Pinjam"] || '',
+                        namaPeminjam: x["Nama Peminjam"] || '',
+                        noInventaris: x["No Inventaris"] || '',
+                        namaEquipment: x["Nama Equipment / Tool"] || '',
+                        brandType: x["Brand / Type"] || '',
+                        qtyPinjam: parseInt(x["Qty Pinjam"]) || 1,
+                        satuan: x["Sat"] || 'Unit',
+                        lokasiKerja: x["Lokasi Kerja"] || '',
+                        tglKembali: x["Tgl Kembali"] || '',
+                        qtyKembali: parseInt(x["Qty Kembali"]) || 1,
+                        kondisiKembali: x["Kondisi Kembali"] || 'baik',
+                        statusPerbaikan: 'selesai'
+                    }));
                 }
 
                 window.saveDataCloud();
