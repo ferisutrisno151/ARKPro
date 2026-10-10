@@ -985,7 +985,7 @@
             closePerbaikanModal();
         }
 
-        // --- STOK ALAT & REKONSILIASI ---
+        // --- STOK ALAT & REKONSILIASI (DIPERBAIKI) ---
         function calculateStokSummary() {
             let map = {};
             window.appData.inventaris.forEach(inv => {
@@ -1003,19 +1003,28 @@
                 };
             });
 
+            // Hitung total awal yang sedang dipinjam
             window.appData.peminjaman.forEach(p => {
                 if(map[p.noInventaris]) {
                     map[p.noInventaris].dipinjam += p.qty;
                 }
             });
 
+            // Kurangi qty di kolom pinjam berdasarkan total barang yang sudah dikembalikan (kondisi apapun)
             window.appData.pengembalian.forEach(k => {
                 if(map[k.noInventaris]) {
+                    // Setiap pengembalian mengurangi jumlah aktif di kolom dipinjam
+                    map[k.noInventaris].dipinjam -= k.qtyKembali;
+                    if(map[k.noInventaris].dipinjam < 0) map[k.noInventaris].dipinjam = 0;
+
+                    // Klasifikasikan berdasarkan kondisi kembalinya
                     if(k.kondisiKembali === 'perbaikan') {
                         if(k.statusPerbaikan === 'pending') {
                             map[k.noInventaris].perbaikan += k.qtyKembali;
                         } else if(k.statusPerbaikan === 'rusak_total') {
                             map[k.noInventaris].rusak += k.qtyKembali;
+                        } else if(k.statusPerbaikan === 'selesai_perbaikan') {
+                            // Selesai diperbaiki kembali baik ke gudang (tersedia)
                         }
                     } else if(k.kondisiKembali === 'rusak') {
                         map[k.noInventaris].rusak += k.qtyKembali;
@@ -1023,14 +1032,20 @@
                 }
             });
 
+            // Hitung ulang ketersediaan alat di gudang
             Object.keys(map).forEach(key => {
                 let item = map[key];
-                let currentPinjamQty = 0;
-                window.appData.peminjaman.filter(p => p.noInventaris === key).forEach(p => currentPinjamQty += p.qty);
                 
+                // Kalkulasi akurat per item inventaris
+                let totalPinjamAwal = 0;
+                window.appData.peminjaman.filter(p => p.noInventaris === key).forEach(p => totalPinjamAwal += p.qty);
+
+                let qtyKembaliTotal = 0;
                 let currentPerbaikanQty = 0;
                 let currentRusakQty = 0;
+
                 window.appData.pengembalian.filter(k => k.noInventaris === key).forEach(k => {
+                    qtyKembaliTotal += k.qtyKembali;
                     if(k.kondisiKembali === 'perbaikan') {
                         if(k.statusPerbaikan === 'pending') currentPerbaikanQty += k.qtyKembali;
                         if(k.statusPerbaikan === 'rusak_total') currentRusakQty += k.qtyKembali;
@@ -1039,9 +1054,13 @@
                     }
                 });
 
-                item.dipinjam = currentPinjamQty;
+                let sisaDipinjam = totalPinjamAwal - qtyKembaliTotal;
+                if(sisaDipinjam < 0) sisaDipinjam = 0;
+
+                item.dipinjam = sisaDipinjam;
                 item.perbaikan = currentPerbaikanQty;
                 item.rusak = currentRusakQty;
+                // Tersedia = Total - DipinjamAktif - Perbaikan - Rusak
                 item.tersedia = item.totalAlat - item.dipinjam - item.perbaikan - item.rusak;
                 if(item.tersedia < 0) item.tersedia = 0;
             });
